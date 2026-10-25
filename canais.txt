@@ -1,0 +1,12 @@
+# Atualize aqui depois vai em scripts/atualizar_lives.py e atualiza seguindo o modelo(duas linhas abaixo)
+#    if "bandjornal" in nome or "band jornal" in nome:
+#        return "bandjornal"
+
+
+BandNews|https://www.youtube.com/radiobandnewsfm/live
+BandJornal|https://www.youtube.com/@bandjornalismo/live
+CNN Brasil|https://www.youtube.com/@CNNbrasil/live
+Jovem Pan|https://www.youtube.com/@jovempannews/live
+Record News|https://www.youtube.com/@recordnews/live
+SBT News|https://www.youtube.com/@sbtnews/live
+TV Novo Tempo|https://www.youtube.com/channel/UC_OaSsAydgSIjUtjYn9qLog/live

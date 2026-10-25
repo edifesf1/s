@@ -1,0 +1,5 @@
+LOGIN DE ACESSO — YOUTUBE IPTV
+
+Os logins são lidos diretamente do arquivo LOGINS-200.txt quando o site abre. Para adicionar, remover ou trocar códigos, edite esse arquivo no GitHub e faça commit. Use um código por linha, no formato YT seguido de 8 letras/números (ex.: YT70N7EZAV). Não precisa editar index.html.
+
+IMPORTANTE: o projeto usa GitHub Pages, que é um site estático. A validação acontece no navegador e os códigos podem ser vistos por alguém que inspecione os arquivos publicados. Portanto, isso serve como uma barreira simples, não como segurança real para conteúdo privado. Para proteger de verdade, é necessário autenticar no servidor (backend) e validar os logins sem expor a lista no navegador.

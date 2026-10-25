@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Youtube IPTV</title>
+<style>
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;min-height:100%;margin:0;overflow:hidden;background:#000;color:#fff;font-family:Arial,sans-serif}
+body{display:flex;flex-direction:column}
+header{
+  position:relative;z-index:100;flex:0 0 auto;width:100%;
+  display:flex;align-items:center;gap:8px;padding:8px 12px;
+  min-height:58px;background:#c00;
+}
+#cascadeBar{display:flex;align-items:center;gap:7px;flex:1 1 auto;min-width:0;overflow-x:auto;background:transparent}
+.cascade-group{display:flex;flex:1 1 0;min-width:0}
+.cascade-group label{display:none}
+.cascade-group select{
+  width:100%;min-width:0;max-width:240px;padding:9px 22px 9px 8px;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;
+  background:#a90000;color:#fff;font-size:14px;outline:none
+}
+.cascade-group select:focus{border-color:#fff}
+.cascade-group[hidden]{display:none}
+#navegacaoCanais{display:flex;align-items:center;justify-content:center;gap:5px;flex:0 0 auto}
+#navegacaoCanais button{
+  display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;
+  padding:0;border:1px solid rgba(255,255,255,.65);border-radius:6px;
+  background:#990000;color:#fff;font-size:22px;font-weight:bold;cursor:pointer
+}
+#navegacaoCanais button:disabled{opacity:.45;cursor:not-allowed}
+#botaoTarja{
+  display:inline-flex;align-items:center;justify-content:center;
+  flex:0 0 auto;width:30px;height:30px;padding:0;
+  border:1px solid rgba(255,255,255,.7);border-radius:5px;
+  background:#790000;color:#fff;font-size:18px;font-weight:bold;line-height:1;cursor:pointer
+}
+#temaAtual{display:none}
+main{position:relative;flex:1 1 auto;min-width:0;min-height:0;width:100%;overflow:hidden;background:#000}
+#player{position:absolute;inset:0;width:100%;height:100%;background:#000;overflow:hidden}
+#player iframe,#player video,#player>div,#player>div iframe{display:block;width:100%!important;height:100%!important;border:0}
+#status,#lista{display:none!important}
+#drawerOverlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:900;display:none}
+#drawerOverlay.aberto{display:block}
+#drawer{width:min(320px,86vw);height:100%;overflow-y:auto;background:#1b1b1b;box-shadow:4px 0 16px rgba(0,0,0,.4);padding:0 0 20px}
+.drawerHeader{display:flex;justify-content:space-between;align-items:center;background:#c00;padding:17px 16px;font-size:20px;font-weight:bold}
+#closeMenu{border:0;color:#fff;background:transparent;font-size:28px;cursor:pointer}
+.menuIntro{color:#bbb;font-size:13px;padding:15px 16px 8px}
+#temasMenu{display:grid}
+#temasMenu button{background:transparent;border:0;color:#eee;text-align:left;padding:14px 18px;font-size:16px;cursor:pointer;border-bottom:1px solid #333}
+#temasMenu button:hover,#temasMenu button.ativo{background:#383030;color:#fff;border-left:4px solid #f33}
+body.bloqueado{overflow:hidden}
+body.bloqueado>header,body.bloqueado>main{visibility:hidden}
+#telaLogin{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at top,#3a1010,#090909 65%)}
+#caixaLogin{width:min(420px,100%);padding:30px;border-radius:16px;background:#1b1b1b;border:1px solid #454545;box-shadow:0 18px 60px rgba(0,0,0,.55);text-align:center}
+#caixaLogin h1{margin:0 0 8px;font-size:26px}
+#caixaLogin p{color:#bbb;line-height:1.5}
+#campoLogin{width:100%;padding:14px;margin:12px 0;border-radius:8px;border:1px solid #555;background:#101010;color:#fff;font-size:18px;text-align:center;text-transform:uppercase}
+#entrarLogin{width:100%;padding:14px;border:0;border-radius:8px;background:#c00;color:#fff;font-size:17px;font-weight:bold;cursor:pointer}
+#entrarLogin:disabled{opacity:.55}
+#erroLogin{min-height:22px;color:#ff7777;font-size:14px}
+@media(max-width:600px){
+  header{gap:5px;padding:7px 6px;min-height:52px}
+  #cascadeBar{gap:4px}
+  .cascade-group select{max-width:none;font-size:11px;padding:8px 15px 8px 4px}
+  #navegacaoCanais{gap:3px}
+  #navegacaoCanais button{width:30px;height:32px;font-size:18px}
+  #botaoTarja{width:27px;height:27px;font-size:16px}
+}
+@media(max-width:360px){
+  header{gap:3px;padding:5px 4px}
+  .cascade-group select{font-size:10px;padding-left:3px}
+  #navegacaoCanais button{width:27px}
+  #botaoTarja{width:25px;height:25px;font-size:15px}
+}
+
+/* Ao recolher a tarja, o vídeo ocupa toda a tela e o botão continua acessível. */
+body.tarja-recolhida>header{
+  position:fixed;top:0;left:0;right:0;height:0;min-height:0;padding:0;
+  background:transparent;pointer-events:none;z-index:200
+}
+body.tarja-recolhida>header>#cascadeBar,
+body.tarja-recolhida>header>#navegacaoCanais{display:none}
+body.tarja-recolhida>header>#botaoTarja{
+  position:fixed;top:8px;right:8px;pointer-events:auto;
+  width:30px;height:30px;background:rgba(120,0,0,.78);
+  border-color:rgba(255,255,255,.55);opacity:.78
+}
+body.tarja-recolhida>main{
+  position:fixed;inset:0;width:100%;height:100%;min-height:0;
+  flex:none
+}
+body.tarja-recolhida #player{position:absolute;inset:0;width:100%;height:100%}
+body.tarja-recolhida>header>#botaoTarja:hover,
+body.tarja-recolhida>header>#botaoTarja:focus{opacity:1}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.15"></script>
+</head>
+<body class="bloqueado">
+<section id="telaLogin" aria-label="Tela de login">
+  <form id="caixaLogin">
+    <h1>Youtube IPTV</h1>
+    <p>Digite seu login de acesso para continuar.<br>Não é necessária senha.</p>
+    <input id="campoLogin" name="login" autocomplete="off" autocapitalize="characters"
+      placeholder="Ex.: A7B29X" maxlength="6" minlength="6"
+      pattern="[A-Za-z0-9]{6}" required>
+    <button id="entrarLogin" type="submit">ENTRAR</button>
+    <div id="erroLogin" role="alert"></div>
+  </form>
+</section>
+
+<header aria-label="Controles do player">
+  <nav id="cascadeBar" aria-label="Filtros">
+    <div class="cascade-group" id="grupoA1"><label for="menuA1">Tema</label><select id="menuA1" title="Tema" aria-label="Tema"><option value=""></option></select></div>
+    <div class="cascade-group" id="grupoB2" hidden>
+  <label for="menuB2">Categoria ou pesquisa</label>
+  <select id="menuB2" title="Categoria" aria-label="Categoria">
+    <option value=""></option>
+  </select>
+  <input id="campoPesquisa" type="search"
+    placeholder="Pesquisar conteúdo..."
+    aria-label="Pesquisar canais, filmes, séries e músicas"
+    style="display:none;width:100%;min-width:100px;padding:9px 8px;border-radius:5px;border:1px solid white;background:#a90000;color:white;font-size:14px">
+</div>
+
+<div class="cascade-group" id="grupoC3" hidden>
+  <label for="menuC3">Resultados</label>
+  <select id="menuC3" title="Resultados" aria-label="Resultados">
+    <option value=""></option>
+  </select>
+</div>
+    <div class="cascade-group" id="grupoD4" hidden><label for="menuD4">Episódio</label><select id="menuD4" title="Episódio" aria-label="Episódio"><option value=""></option></select></div>
+  </nav>
+  <div id="navegacaoCanais" aria-label="Navegação entre canais">
+    <button id="canalAnterior" type="button" title="Canal anterior" aria-label="Canal anterior">◀</button>
+    <button id="proximoCanal" type="button" title="Próximo canal" aria-label="Próximo canal">▶</button>
+  </div>
+  <button id="botaoTarja" type="button" title="Recolher tarja" aria-label="Recolher tarja" aria-pressed="false">▁</button>
+</header>
+
+<main>
+  <div id="player"></div>
+  <div id="status">Carregando lista de vídeos...</div>
+  <div id="lista"></div>
+</main>
+
+<script>
+const tarja = document.querySelector("header");
+const navegacaoCanais = document.getElementById("navegacaoCanais");
+const telaLogin = document.getElementById("telaLogin");
+const campoLogin = document.getElementById("campoLogin");
+const erroLogin = document.getElementById("erroLogin");
+const botaoEntrar = document.getElementById("entrarLogin");
+const status = document.getElementById("status");
+const lista = document.getElementById("lista");
+const menuA1 = document.getElementById("menuA1");
+const menuB2 = document.getElementById("menuB2");
+const menuC3 = document.getElementById("menuC3");
+const menuD4 = document.getElementById("menuD4");
+  
+const campoPesquisa = document.getElementById("campoPesquisa");
+let modoPesquisa = false;
+  
+const grupos = {
+  A1:document.getElementById("grupoA1"),
+  B2:document.getElementById("grupoB2"),
+  C3:document.getElementById("grupoC3"),
+  D4:document.getElementById("grupoD4")
+};
+const botaoCanalAnterior = document.getElementById("canalAnterior");
+const botaoProximoCanal = document.getElementById("proximoCanal");
+const botaoTarja = document.getElementById("botaoTarja");
+
+function alternarTarja(){
+  const recolhida = document.body.classList.toggle("tarja-recolhida");
+  botaoTarja.textContent = recolhida ? "☰" : "▁";
+  botaoTarja.title = recolhida ? "Mostrar tarja" : "Recolher tarja";
+  botaoTarja.setAttribute("aria-label", botaoTarja.title);
+  botaoTarja.setAttribute("aria-pressed", String(recolhida));
+}
+botaoTarja.addEventListener("click", alternarTarja);
+
+// URL do servidor responsável exclusivamente pelo controle de sessões.
+const URL_SESSOES = "https://script.google.com/macros/s/AKfycbyjEMCft9Z-84Owpfukv4ROvVv3w2Ax4QsyPvULPuk424Ej8Liz8AU5xmQnoLSDMl2b/exec";
+const DEVICE_KEY = "edifesfDeviceId";
+let heartbeatTimer = null;
+let LOGINS_VALIDOS = [];
+let todosVideos = [];
+let videos = [];
+let player = null;
+let hlsInstance = null;
+let ytPlayerApi = null;
+let geracaoPlayer = 0;
+let ytApiPromise = null;
+let selecionado = 0;
+const falhasRecentes = new Map();
+
+/* A tarja fica sempre visível; não depende de eventos dentro do YouTube. */
+function mostrarTarja(){ tarja.style.visibility="visible"; }
+function ocultarTarja(){ /* A tarja é fixa e não é ocultada. */ }
+
+function registrarFalha(item,tipo,erro,codigo=""){
+  // Registro remoto de falhas desativado; mantém apenas diagnóstico no console.
+  console.warn("Falha de reprodução:", {canal:item?.titulo||"Canal sem nome", tipo, url:item?.url||"", erro:String(erro||"Falha de reprodução"), codigo:String(codigo||"")});
+}
+
+function carregarYouTubeAPI(){
+  if(window.YT&&window.YT.Player)return Promise.resolve();
+  if(ytApiPromise)return ytApiPromise;
+  ytApiPromise=new Promise((resolve,reject)=>{
+    const timeout=setTimeout(()=>reject(new Error("Tempo esgotado ao carregar a API do YouTube")),15000);
+    const callbackAnterior=window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady=()=>{
+      clearTimeout(timeout);
+      if(typeof callbackAnterior==="function")callbackAnterior();
+      resolve();
+    };
+    let script=document.querySelector('script[src="https://www.youtube.com/iframe_api"]');
+    if(!script){
+      script=document.createElement("script");
+      script.src="https://www.youtube.com/iframe_api";
+      script.onerror=()=>{clearTimeout(timeout);reject(new Error("Falha ao carregar a API do YouTube"));};
+      document.head.appendChild(script);
+    }
+  });
+  return ytApiPromise;
+}
+
+function ativarTelaCheia(){
+  try{
+    if(!document.fullscreenElement&&document.documentElement.requestFullscreen){
+      document.documentElement.requestFullscreen().catch(()=>{});
+    }
+  }catch(e){console.warn("Tela cheia não autorizada:",e);}
+}
+function obterDeviceId(){
+  let id=localStorage.getItem(DEVICE_KEY);
+  if(!id){id="dev_"+Array.from(crypto.getRandomValues(new Uint8Array(18))).map(n=>n.toString(16).padStart(2,"0")).join("");localStorage.setItem(DEVICE_KEY,id);}
+  return id;
+}
+function chamarControleSessao(action,login){
+  return new Promise((resolve,reject)=>{
+    if(!URL_SESSOES || URL_SESSOES.includes("COLE_AQUI")){reject(new Error("Falta configurar a URL do Apps Script de sessões."));return;}
+    const callback="edifesfCb_"+Date.now()+"_"+Math.floor(Math.random()*1000000);
+    const script=document.createElement("script");
+    const timeout=setTimeout(()=>{limpar();reject(new Error("O servidor de sessões não respondeu."));},12000);
+    function limpar(){clearTimeout(timeout);delete window[callback];script.remove();}
+    window[callback]=(data)=>{limpar();resolve(data);};
+    script.onerror=()=>{limpar();reject(new Error("Não foi possível acessar o servidor de sessões."));};
+    const params=new URLSearchParams({action,login,device:obterDeviceId(),callback,_:String(Date.now())});
+    script.src=URL_SESSOES+"?"+params.toString();document.head.appendChild(script);
+  });
+}
+function pararHeartbeat(){if(heartbeatTimer){clearInterval(heartbeatTimer);heartbeatTimer=null;}}
+function exibirLogin(mensagem){
+  pararHeartbeat();document.body.classList.add("bloqueado");telaLogin.style.display="flex";
+  erroLogin.textContent=mensagem||"Digite seu login de acesso para continuar.";
+}
+function iniciarHeartbeat(login){
+  pararHeartbeat();
+  heartbeatTimer=setInterval(async()=>{
+    try{
+      const resposta=await chamarControleSessao("heartbeat",login);
+      if(!resposta.ok){localStorage.removeItem("youtubeIptvLogin");exibirLogin(resposta.message||"Sua sessão não está mais ativa.");}
+    }catch(e){console.warn("Falha temporária ao renovar sessão:",e);}
+  },30000);
+}
+async function liberarAcesso(login){
+  botaoEntrar.disabled=true;erroLogin.textContent="Verificando dispositivo...";
+  try{
+    const resposta=await chamarControleSessao("claim",login);
+    if(!resposta.ok){localStorage.removeItem("youtubeIptvLogin");erroLogin.textContent=resposta.message||"Acesso negado.";return false;}
+    document.body.classList.remove("bloqueado");telaLogin.style.display="none";
+    localStorage.setItem("youtubeIptvLogin",login);ativarTelaCheia();iniciarHeartbeat(login);return true;
+  }catch(e){
+    console.error(e);erroLogin.textContent="Não foi possível verificar o login no servidor. Confira a implantação do Apps Script.";return false;
+  }finally{botaoEntrar.disabled=false;}
+}
+document.addEventListener("click",()=>{if(!document.fullscreenElement)ativarTelaCheia();});
+document.addEventListener("touchend",()=>{if(!document.fullscreenElement)ativarTelaCheia();},{passive:true});
+
+async function carregarLogins(){
+  botaoEntrar.disabled=true;erroLogin.textContent="Carregando logins...";
+  try{
+    const resposta=await fetch("./LOGINS-200.txt?v="+Date.now(),{cache:"no-store"});
+    if(!resposta.ok)throw new Error("HTTP "+resposta.status);
+    const texto=await resposta.text();
+    LOGINS_VALIDOS=[...new Set(texto.split(/\r?\n/).map(l=>l.trim().toUpperCase()).filter(l=>/^[A-Z0-9]{6}$/.test(l)))];
+    if(!LOGINS_VALIDOS.length)throw new Error("Nenhum login válido encontrado");
+    erroLogin.textContent="";botaoEntrar.disabled=false;await validarLoginSalvo();
+  }catch(e){
+    console.error("Erro ao carregar LOGINS-200.txt:",e);
+    erroLogin.textContent="Não foi possível carregar os logins. Verifique se LOGINS-200.txt está publicado no GitHub.";
+  }
+}
+async function validarLoginSalvo(){
+  const salvo=localStorage.getItem("youtubeIptvLogin");
+  if(salvo&&LOGINS_VALIDOS.includes(salvo)){
+    const ok=await liberarAcesso(salvo);
+    if(!ok && erroLogin.textContent.includes("já está em uso")) localStorage.removeItem("youtubeIptvLogin");
+  } else {localStorage.removeItem("youtubeIptvLogin");exibirLogin("Digite seu login de acesso para continuar.");}
+}
+document.getElementById("caixaLogin").addEventListener("submit",async e=>{
+  e.preventDefault();const login=campoLogin.value.trim().toUpperCase();
+  if(!LOGINS_VALIDOS.includes(login)){erroLogin.textContent="Login inválido. Confira o código e tente novamente.";campoLogin.select();return;}
+  await liberarAcesso(login);
+});
+window.addEventListener("beforeunload",()=>{
+  const login=localStorage.getItem("youtubeIptvLogin");
+  if(login && URL_SESSOES && !URL_SESSOES.includes("COLE_AQUI")){
+    const img=new Image();img.src=URL_SESSOES+"?action=release&login="+encodeURIComponent(login)+"&device="+encodeURIComponent(obterDeviceId())+"&_="+Date.now();
+  }
+});
+
+function atualizarBotoesNavegacao(){botaoCanalAnterior.disabled=botaoProximoCanal.disabled=videos.length<=1;}
+function navegarCanal(direcao){
+  if(!videos.length)return;
+  selecionado=(selecionado+direcao+videos.length)%videos.length;
+  const item=videos[selecionado];
+  if(menuD4.value)menuD4.value=item.titulo;
+  [...lista.children].forEach((b,i)=>b.classList.toggle("ativo",i===selecionado));
+  criarPlayer();
+}
+botaoCanalAnterior.addEventListener("click",()=>navegarCanal(-1));
+botaoProximoCanal.addEventListener("click",()=>navegarCanal(1));
+
+function preencherSelect(select,valores){
+  select.replaceChildren();
+  const inicial=document.createElement("option");inicial.value="";inicial.textContent="";select.appendChild(inicial);
+  [...new Set(valores.filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR")).forEach(valor=>{
+    const option=document.createElement("option");option.value=valor;option.textContent=valor;select.appendChild(option);
+  });
+  select.value="";
+}
+function mostrarGrupo(nome,mostrar){grupos[nome].hidden=!mostrar;}
+function limparAbaixo(nivel){
+  if(nivel<=1){menuB2.value="";mostrarGrupo("B2",false);}
+  if(nivel<=2){menuC3.value="";mostrarGrupo("C3",false);}
+  if(nivel<=3){menuD4.value="";mostrarGrupo("D4",false);}
+}
+function aplicarFiltros(){
+  const tema=menuA1.value,categoria=menuB2.value,classificacao=menuC3.value,episodio=menuD4.value;
+  videos=todosVideos.filter(v=>(!tema||v.tema===tema)&&(!categoria||v.categoria===categoria)&&(!classificacao||v.classificacao===classificacao));
+  lista.replaceChildren();
+  const area=document.getElementById("player");
+  if(hlsInstance){try{hlsInstance.destroy();}catch(e){}hlsInstance=null;}
+  if(ytPlayerApi){try{ytPlayerApi.destroy();}catch(e){}ytPlayerApi=null;}
+  area.replaceChildren();player=null;
+  if(!videos.length){atualizarBotoesNavegacao();status.textContent=tema?"Nenhum vídeo nesta seleção.":"Selecione os menus acima.";return;}
+  videos.forEach((video,index)=>{
+    const botao=document.createElement("button");botao.textContent=`${index+1}. ${video.titulo}`;
+    botao.addEventListener("click",()=>{selecionado=index;criarPlayer();});lista.appendChild(botao);
+  });
+  selecionado=episodio?videos.findIndex(v=>v.titulo===episodio):0;
+  if(selecionado<0)selecionado=0;
+  atualizarBotoesNavegacao();
+  status.textContent=`${videos.length} vídeo(s).`;
+  if(episodio||!player)criarPlayer();
+}
+menuA1.addEventListener("change",()=>{
+  limparAbaixo(1);const tema=menuA1.value;
+  if (tema === "Pesquisa") {
+  ativarPesquisa(true);
+  videos = [];
+  atualizarBotoesNavegacao();
+  document.getElementById("player").replaceChildren();
+  return;
+}
+
+ativarPesquisa(false);
+  if(tema){preencherSelect(menuB2,todosVideos.filter(v=>v.tema===tema).map(v=>v.categoria));mostrarGrupo("B2",true);}
+  aplicarFiltros();
+});
+menuB2.addEventListener("change",()=>{
+  limparAbaixo(2);const tema=menuA1.value,categoria=menuB2.value;
+  if(tema&&categoria){preencherSelect(menuC3,todosVideos.filter(v=>v.tema===tema&&v.categoria===categoria).map(v=>v.classificacao));mostrarGrupo("C3",true);}
+  aplicarFiltros();
+});
+menuC3.addEventListener("change",()=>{
+  if(modoPesquisa){
+    if(menuC3.value==="")return;
+    const indice=Number(menuC3.value);
+    if(!Number.isInteger(indice)||indice<0||indice>=videos.length)return;
+    selecionado=indice;
+    criarPlayer();
+    return;
+  }
+
+  limparAbaixo(3);
+  const tema=menuA1.value,categoria=menuB2.value,classificacao=menuC3.value;
+  if(tema&&categoria&&classificacao){
+    preencherSelect(menuD4,todosVideos.filter(v=>v.tema===tema&&v.categoria===categoria&&v.classificacao===classificacao).map(v=>v.titulo));
+    mostrarGrupo("D4",true);
+  }
+  aplicarFiltros();
+});
+menuD4.addEventListener("change",aplicarFiltros);
+
+function limparPlayerPesquisa(){
+  geracaoPlayer++;
+  if(hlsInstance){try{hlsInstance.destroy();}catch(e){}hlsInstance=null;}
+  if(ytPlayerApi){try{ytPlayerApi.destroy();}catch(e){}ytPlayerApi=null;}
+  document.getElementById("player").replaceChildren();
+  player=null;
+}
+
+function ativarPesquisa(ativar) {
+  modoPesquisa = ativar;
+  campoPesquisa.style.display = ativar ? "block" : "none";
+  menuB2.style.display = ativar ? "none" : "";
+  mostrarGrupo("B2", ativar);
+  mostrarGrupo("C3", ativar);
+  mostrarGrupo("D4", false);
+
+  if (ativar) {
+    limparPlayerPesquisa();
+    videos = [];
+    selecionado = 0;
+    campoPesquisa.value = "";
+    menuC3.replaceChildren();
+    const opcao = document.createElement("option");
+    opcao.value = "";
+    opcao.textContent = "Digite para pesquisar";
+    menuC3.appendChild(opcao);
+    menuC3.disabled = true;
+    atualizarBotoesNavegacao();
+    status.textContent = "Digite o nome de um canal ou conteúdo.";
+    campoPesquisa.focus();
+  } else {
+    menuC3.disabled = false;
+    campoPesquisa.value = "";
+  }
+}
+
+function pesquisarConteudo() {
+  if (!modoPesquisa) return;
+
+  const termo = campoPesquisa.value.trim().toLocaleLowerCase("pt-BR");
+  // A pesquisa considera somente os dois últimos campos: classificação (C3) e título (D4).
+  const encontrados = termo
+    ? todosVideos.filter(v =>
+        [v.classificacao, v.titulo]
+          .some(valor => String(valor || "").toLocaleLowerCase("pt-BR").includes(termo))
+      )
+    : [];
+
+  // Ao mudar a busca, interrompe o conteúdo anterior para não deixar um vídeo antigo tocando.
+  limparPlayerPesquisa();
+  videos = encontrados;
+  selecionado = 0;
+  menuC3.replaceChildren();
+
+  const inicial = document.createElement("option");
+  inicial.value = "";
+  inicial.textContent = termo
+    ? (encontrados.length
+        ? `${encontrados.length} resultado(s) encontrado(s)`
+        : "Nenhum resultado encontrado")
+    : "Digite para pesquisar";
+  menuC3.appendChild(inicial);
+
+  encontrados.forEach((video, indice) => {
+    const opcao = document.createElement("option");
+    opcao.value = String(indice);
+    // Mostra juntos os campos C3 e D4 no resultado.
+    opcao.textContent = [video.classificacao, video.titulo].filter(Boolean).join(" - ");
+    menuC3.appendChild(opcao);
+  });
+
+  menuC3.disabled = encontrados.length === 0;
+  atualizarBotoesNavegacao();
+  status.textContent = encontrados.length
+    ? `${encontrados.length} resultado(s). Selecione um conteúdo para reproduzir.`
+    : (termo ? "Nenhum conteúdo corresponde à pesquisa." : "Digite o nome de um canal ou conteúdo.");
+}
+
+campoPesquisa.addEventListener("input", pesquisarConteudo);
+
+function extrairId(valor){
+  try{
+    const url=new URL(valor);
+    if(url.hostname==="youtu.be")return url.pathname.split("/").filter(Boolean)[0]||null;
+    if(!["youtube.com","www.youtube.com","m.youtube.com","youtube-nocookie.com","www.youtube-nocookie.com"].includes(url.hostname))return null;
+    if(url.pathname==="/watch")return url.searchParams.get("v");
+    const partes=url.pathname.split("/").filter(Boolean);
+    if(["embed","shorts","live","v"].includes(partes[0]))return partes[1]||null;
+    return null;
+  }catch(e){return null;}
+}
+
+function criarPlayer(){
+  if(!videos.length)return;
+  const item=videos[selecionado];if(!item)return;
+  const area=document.getElementById("player"),geracao=++geracaoPlayer;
+  if(ytPlayerApi){try{ytPlayerApi.destroy();}catch(e){}ytPlayerApi=null;}
+  if(hlsInstance){try{hlsInstance.destroy();}catch(e){}hlsInstance=null;}
+  area.replaceChildren();player=null;
+
+  if(item.tipo==="hls"||/\.m3u8(?:$|[?#])/i.test(item.url)){
+    const videoEl=document.createElement("video");
+    videoEl.title=item.titulo;videoEl.controls=true;videoEl.autoplay=true;videoEl.playsInline=true;videoEl.preload="metadata";
+    videoEl.style.cssText="display:block;width:100%;height:100%;object-fit:contain;background:#000;";
+    area.appendChild(videoEl);player=videoEl;
+    videoEl.addEventListener("error",()=>{
+      const e=videoEl.error;console.error("Erro do elemento de vídeo:",{code:e?.code,message:e?.message,url:item.url});
+      if(e)status.textContent="Erro no vídeo (código "+e.code+").";
+    });
+    if(window.Hls&&Hls.isSupported()){
+      hlsInstance=new Hls({enableWorker:true,lowLatencyMode:false,backBufferLength:30,manifestLoadingTimeOut:20000,manifestLoadingMaxRetry:3,manifestLoadingRetryDelay:1000,levelLoadingTimeOut:20000,fragLoadingTimeOut:30000,fragLoadingMaxRetry:4,fragLoadingRetryDelay:1000});
+      hlsInstance.on(Hls.Events.MANIFEST_PARSED,()=>{
+        videoEl.play().then(()=>{status.textContent="Transmissão HLS reproduzindo.";}).catch(()=>{status.textContent="Transmissão carregada. Pressione Play no vídeo.";});
+      });
+      let rede=false,midia=false;
+      hlsInstance.on(Hls.Events.ERROR,(_event,data)=>{
+        console.error("Erro HLS:",data);
+        if(!data.fatal)return;
+        registrarFalha(item,"M3U8/HLS",data.details||data.error?.message||"Erro HLS fatal",data.response?.code||data.details||"");
+        if(data.type===Hls.ErrorTypes.NETWORK_ERROR&&!rede){rede=true;hlsInstance.startLoad();}
+        else if(data.type===Hls.ErrorTypes.MEDIA_ERROR&&!midia){midia=true;hlsInstance.recoverMediaError();}
+        else{status.textContent="Falha HLS: "+data.details;try{hlsInstance.destroy();}catch(e){}hlsInstance=null;}
+      });
+      hlsInstance.loadSource(item.url);hlsInstance.attachMedia(videoEl);
+    }else if(videoEl.canPlayType("application/vnd.apple.mpegurl")){
+      videoEl.src=item.url;videoEl.play().catch(()=>{status.textContent="Transmissão carregada. Pressione Play no vídeo.";});
+    }else status.textContent="Este navegador não oferece suporte à reprodução HLS.";
+    return;
+  }
+
+  const container=document.createElement("div");container.id="youtube-player-container-"+geracao;
+  container.style.cssText="width:100%;height:100%;background:#000;";area.appendChild(container);
+  status.textContent="Carregando player do YouTube…";
+  carregarYouTubeAPI().then(()=>{
+    if(geracao!==geracaoPlayer||!area.contains(container))return;
+    ytPlayerApi=new YT.Player(container.id,{
+      width:"100%",height:"100%",videoId:item.id,
+      playerVars:{autoplay:1,playsinline:1,rel:0,enablejsapi:1,origin:location.origin},
+      events:{
+        onReady:event=>{status.textContent="Player do YouTube carregado.";event.target.playVideo();},
+        onStateChange:event=>{if(event.data===YT.PlayerState.PLAYING)status.textContent="Reproduzindo: "+item.titulo;},
+        onError:event=>{
+          const mensagens={2:"Parâmetro ou ID de vídeo inválido",5:"Erro no player HTML5 do YouTube",100:"Vídeo removido, privado ou não encontrado",101:"Vídeo não permite reprodução incorporada",150:"Vídeo não permite reprodução incorporada",153:"Erro de identificação do player ou Referer"};
+          status.textContent="Falha no canal: "+item.titulo+". Código "+event.data;
+          registrarFalha(item,"YouTube",mensagens[event.data]||"Erro informado pelo player do YouTube",event.data);
+        }
+      }
+    });
+    player=ytPlayerApi;
+  }).catch(erro=>{
+    if(geracao!==geracaoPlayer)return;
+    status.textContent="Não foi possível carregar o player do YouTube.";
+    registrarFalha(item,"YouTube",erro.message||"Falha ao carregar a API do YouTube","API");
+  });
+}
+
+async function carregarLista(){
+  try{
+    const resposta=await fetch("./youtube.txt?v="+Date.now(),{cache:"no-store"});
+    if(!resposta.ok)throw new Error("HTTP "+resposta.status);
+    const texto=await resposta.text();
+    todosVideos=texto.split(/\r?\n/).map(l=>l.trim()).filter(l=>l&&!l.startsWith("#")).map((linha,indice)=>{
+      const partes=linha.split("|").map(p=>p.trim());
+      let tema,categoria,classificacao,titulo,url;
+      if(partes.length>=5){[tema,categoria,classificacao,titulo]=partes;url=partes.slice(4).join("|").trim();}
+      else if(partes.length>=3){
+        const temaAntigo=partes[0]||"Geral";titulo=partes[1]||"Vídeo "+(indice+1);url=partes.slice(2).join("|").trim();
+        tema=/bíblic|preg|igreja|relig|estudo/i.test(temaAntigo+" "+titulo)?"religioso":"normal";
+        categoria=/live|ao vivo|rádio|radio|notícia|cnn|jovem pan|record news|sbt news/i.test(titulo+" "+url)?"live":"filmes";
+        classificacao=temaAntigo;
+      }else if(partes.length===2){titulo=partes[0]||"Vídeo "+(indice+1);url=partes[1];tema="normal";categoria="filmes";classificacao="Geral";}
+      else{titulo="Vídeo "+(indice+1);url=partes[0];tema="normal";categoria="filmes";classificacao="Geral";}
+      tema=tema||"Normal";categoria=categoria||"Filmes";classificacao=classificacao||"Geral";titulo=titulo||"Vídeo "+(indice+1);
+      const id=extrairId(url),tipo=/\.m3u8(?:$|[?#])/i.test(url)?"hls":(id?"youtube":"desconhecido");
+      if(tipo==="hls")return{tema,categoria,classificacao,titulo,id:null,url,tipo};
+      return id?{tema,categoria,classificacao,titulo,id,url,tipo}:null;
+    }).filter(Boolean);
+    // "Pesquisa" fica sempre como primeira opção; os temas vêm depois em ordem alfabética.
+    const temas = [...new Set(todosVideos.map(v => v.tema).filter(Boolean))]
+      .filter(tema => tema !== "Pesquisa")
+      .sort((a, b) => a.localeCompare(b, "pt-BR"));
+    menuA1.replaceChildren();
+    const opcaoPesquisa = document.createElement("option");
+    opcaoPesquisa.value = "Pesquisa";
+    opcaoPesquisa.textContent = "Pesquisa";
+    menuA1.appendChild(opcaoPesquisa);
+    temas.forEach(tema => {
+      const opcao = document.createElement("option");
+      opcao.value = tema;
+      opcao.textContent = tema;
+      menuA1.appendChild(opcao);
+    });
+    menuA1.value = "";
+    limparAbaixo(1);
+    aplicarFiltros();
+  }catch(erro){console.error(erro);status.textContent="Erro ao ler youtube.txt. Verifique se o arquivo está publicado no GitHub Pages.";}
+}
+
+carregarLogins();
+carregarLista();
+</script>
+</body>
+</html>

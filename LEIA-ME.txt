@@ -1,0 +1,42 @@
+# Youtube IPTV — menu por temas
+
+## Como publicar
+1. Extraia este ZIP no computador.
+2. No GitHub, abra o repositório `Youtube_m3u8`.
+3. Envie/substitua os arquivos mantendo os caminhos e pastas.
+4. Faça commit na branch `main`.
+5. Abra o endereço do GitHub Pages para testar.
+
+## Como adicionar vídeos
+Edite `youtube.txt`, usando uma linha por vídeo neste formato:
+
+Formato novo (5 campos):
+`Tema|Categoria|Classificação|Episódio/Título|URL`
+
+Exemplos:
+`normal|live|Notícias|CNN Brasil|https://www.youtube.com/@CNNbrasil/live`
+`religioso|series|Temporada 1|Episódio 1 - Apocalipse|https://www.youtube.com/watch?v=XXXXXXXXXXX`
+`infantil|filmes|Animação|A aventura|https://www.youtube.com/watch?v=XXXXXXXXXXX`
+
+Os menus aparecem em sequência: A1 Tema (normal, religioso, infantil), B2 Categoria (live, filmes, series), C3 Classificação (Ação, Comédia, Terror, Drama, Temporada etc.) e D4 Episódio/Título. Cada menu seguinte aparece quando você seleciona o anterior. As opções de B2, C3 e D4 são geradas automaticamente com base nos itens cadastrados em youtube.txt.
+
+O formato antigo `Tema|Título|URL` continua sendo aceito e convertido para uma classificação compatível. O formato antigo `Título|URL` também continua sendo aceito.
+
+
+## Correção do player
+A versão atualizada não carrega a YouTube IFrame API externa. Ela usa um iframe de incorporação padrão e troca o vídeo quando você seleciona um item. Isso evita o erro causado especificamente pelo carregamento de `youtube.com/iframe_api`. Vídeos que desativam incorporação ainda podem não tocar.
+
+
+## Tela de login
+O site agora solicita um dos 200 códigos do arquivo `LOGINS-200.txt`. Não é necessária senha. O acesso fica liberado durante a sessão atual do navegador; o botão “Sair” encerra a sessão.
+
+**Aviso:** como o GitHub Pages é estático, esta tela não oferece proteção real contra alguém que inspecione os arquivos e veja os códigos. Para controle de acesso seguro, será necessário um backend de autenticação.
+
+
+ATUALIZAR LOGIN: os códigos são lidos de LOGINS-200.txt em cada abertura do site. Edite esse arquivo, um login por linha (YT + 8 letras/números), e faça commit no GitHub. Para os vídeos, edite youtube.txt e faça commit; o site lê esse arquivo novamente ao abrir.
+
+
+LINKS HLS (.m3u8)
+O site agora aceita links diretos .m3u8 no mesmo formato de cinco campos do youtube.txt. Exemplo:
+Normal|Live|Notícias|Band PA|https://servidor/exemplo/playlist.m3u8
+A reprodução depende de o endereço estar ativo e o servidor permitir acesso do navegador (CORS).
