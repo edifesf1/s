@@ -1,0 +1,47 @@
+
+name: Atualizar transmissões do YouTube
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: atualizar-lives
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Instalar yt-dlp
+        run: |
+          python -m pip install --upgrade yt-dlp
+          yt-dlp --version
+
+      - name: Atualizar youtube.txt
+        run: python scripts/atualizar_lives.py
+
+      - name: Salvar alterações
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add youtube.txt
+          if ! git diff --cached --quiet; then
+            git commit -m "Atualiza links das lives"
+            git push
+          else
+            echo "Nenhuma alteração necessária."
+          fi
