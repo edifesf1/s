@@ -5,8 +5,8 @@
 
 #Notícias
     #LiveYoutube
-Normal|Live|Notícias|BandJornal|https://www.youtube.com/watch?v=KznWTBFSHOE
-Normal|Live|Notícias|BandNews|https://www.youtube.com/watch?v=le0uHrL4RJ4
+Normal|Live|Notícias|BandJornal|https://www.youtube.com/watch?v=2gRTiQYxhOg
+Normal|Live|Notícias|BandNews|https://www.youtube.com/watch?v=dBMGWcGtqNU
 Normal|Live|Notícias|CNN Brasil|https://www.youtube.com/watch?v=o6Z6Ax_XVsY
 
 #Notícias
