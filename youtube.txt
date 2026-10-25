@@ -16,14 +16,14 @@ Normal|Live|Notícias|0 SBT News 2|https://sbtNews.maissbt.com/3.m3u8
 Normal|Live|Notícias|0 Veja +|https://gpa-vja.otteravision.com/gpa/vja/vja.m3u8
 Normal|Live|Notícias|J3News TV|https://video01.brascast.com/d92ebb4f/d92ebb4f/playlist.m3u8
     #LiveYoutube
-Normal|Live|Notícias|Jovem Pan|https://www.youtube.com/watch?v=W1pXwK-tBm8
+Normal|Live|Notícias|Jovem Pan|https://www.youtube.com/watch?v=eTz4XgOQaAE
 Normal|Live|Notícias|JovemPan - Cidade Verde|https://televisaocidadeverde.brasilstream.com.br/hls/televisaocidadeverde/index.m3u8
 Normal|Live|Notícias|JovemPan-TvFronteira|https://tvfronteira.brasilstream.com.br/hls/tvfronteira/index.m3u8
     #LiveYoutube
 Normal|Live|Notícias|Record News|https://www.youtube.com/watch?v=TCRFQXkZ8fs
 Normal|Live|Notícias|RS News|https://video07.logicahost.com.br/rsnews01/rsnews01/playlist.m3u8
     #LiveYoutube
-Normal|Live|Notícias|SBT News|https://www.youtube.com/watch?v=MY7nF9APnmA
+Normal|Live|Notícias|SBT News|https://www.youtube.com/watch?v=J8ZRQpbPffc
 Normal|Live|Notícias|TCM 10|https://live.tcm10.com.br/tcm10hd/stream.m3u8
 
 #Agro
