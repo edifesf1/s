@@ -6,8 +6,8 @@
 #Notícias
     #LiveYoutube
 Normal|Live|Notícias|BandJornal|https://www.youtube.com/watch?v=KznWTBFSHOE
-Normal|Live|Notícias|BandNews|https://www.youtube.com/watch?v=LT9OAhi9Np0
-Normal|Live|Notícias|CNN Brasil|https://www.youtube.com/watch?v=PT1elxQmzqg
+Normal|Live|Notícias|BandNews|https://www.youtube.com/watch?v=le0uHrL4RJ4
+Normal|Live|Notícias|CNN Brasil|https://www.youtube.com/watch?v=2H06jLK6oeM
 
 #Notícias
 Normal|Live|Notícias|Jovem Pan|https://amg01391-amg01391c3-tcl-spain-5038.playouts.now.amagi.tv/playlist1080-p.m3u8
