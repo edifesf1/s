@@ -283,7 +283,11 @@ document.addEventListener("touchend",()=>{if(!document.fullscreenElement)ativarT
 async function carregarLogins(){
   botaoEntrar.disabled=true;erroLogin.textContent="Carregando logins...";
   try{
-    const resposta=await fetch("./LOGINS-200.txt?v="+Date.now(),{cache:"no-store"});
+    //const resposta=await fetch("./LOGINS-200.txt?v="+Date.now(),{cache:"no-store"});
+    const resposta = await fetch(
+  "https://raw.githubusercontent.com/edifesf1/s/refs/heads/main/LOGINS-200.txt?v=" + Date.now(),
+  { cache: "no-store" }
+);
     if(!resposta.ok)throw new Error("HTTP "+resposta.status);
     const texto=await resposta.text();
     LOGINS_VALIDOS=[...new Set(texto.split(/\r?\n/).map(l=>l.trim().toUpperCase()).filter(l=>/^[A-Z0-9]{6}$/.test(l)))];
