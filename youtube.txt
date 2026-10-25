@@ -20,10 +20,10 @@ Normal|Live|Notícias|zJovem Pan|https://www.youtube.com/watch?v=eTz4XgOQaAE
 Normal|Live|Notícias|zJovemPan - Cidade Verde|https://televisaocidadeverde.brasilstream.com.br/hls/televisaocidadeverde/index.m3u8
 Normal|Live|Notícias|zJovemPan-TvFronteira|https://tvfronteira.brasilstream.com.br/hls/tvfronteira/index.m3u8
     #LiveYoutube
-Normal|Live|Notícias|zRecord News|https://www.youtube.com/watch?v=TCRFQXkZ8fs
+Normal|Live|Notícias|Record News|https://www.youtube.com/watch?v=TCRFQXkZ8fs
 Normal|Live|Notícias|zRS News|https://video07.logicahost.com.br/rsnews01/rsnews01/playlist.m3u8
     #LiveYoutube
-Normal|Live|Notícias|zSBT News|https://www.youtube.com/watch?v=J8ZRQpbPffc
+Normal|Live|Notícias|SBT News|https://www.youtube.com/watch?v=J8ZRQpbPffc
 Normal|Live|Notícias|zTCM 10|https://live.tcm10.com.br/tcm10hd/stream.m3u8
 
 #Agro
