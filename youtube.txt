@@ -5,26 +5,26 @@
 
 #Notícias
     #LiveYoutube
-Normal|Live|Notícias|0 BandJornal|https://www.youtube.com/watch?v=KznWTBFSHOE
-Normal|Live|Notícias|0 BandNews|https://www.youtube.com/watch?v=PfVJDIwIB1E
-Normal|Live|Notícias|0 CNN Brasil|https://www.youtube.com/watch?v=BOrYMU2jgtc
+Normal|Live|Notícias|BandJornal|https://www.youtube.com/watch?v=KznWTBFSHOE
+Normal|Live|Notícias|BandNews|https://www.youtube.com/watch?v=PfVJDIwIB1E
+Normal|Live|Notícias|CNN Brasil|https://www.youtube.com/watch?v=BOrYMU2jgtc
 
 #Notícias
-Normal|Live|Notícias|0 JovemPan|https://amg01391-amg01391c3-tcl-spain-5038.playouts.now.amagi.tv/playlist1080-p.m3u8
-Normal|Live|Notícias|0 Record News 2|https://rnw-rn.otteravision.com/rnw/rn/rnw_rn.m3u8
-Normal|Live|Notícias|0 SBT News 2|https://sbtNews.maissbt.com/3.m3u8
-Normal|Live|Notícias|0 Veja +|https://gpa-vja.otteravision.com/gpa/vja/vja.m3u8
-Normal|Live|Notícias|J3News TV|https://video01.brascast.com/d92ebb4f/d92ebb4f/playlist.m3u8
+Normal|Live|Notícias|JovemPan|https://amg01391-amg01391c3-tcl-spain-5038.playouts.now.amagi.tv/playlist1080-p.m3u8
+Normal|Live|Notícias|Record News 2|https://rnw-rn.otteravision.com/rnw/rn/rnw_rn.m3u8
+Normal|Live|Notícias|SBT News 2|https://sbtNews.maissbt.com/3.m3u8
+Normal|Live|Notícias|Veja +|https://gpa-vja.otteravision.com/gpa/vja/vja.m3u8
+Normal|Live|Notícias|zJ3News TV|https://video01.brascast.com/d92ebb4f/d92ebb4f/playlist.m3u8
     #LiveYoutube
-Normal|Live|Notícias|Jovem Pan|https://www.youtube.com/watch?v=eTz4XgOQaAE
-Normal|Live|Notícias|JovemPan - Cidade Verde|https://televisaocidadeverde.brasilstream.com.br/hls/televisaocidadeverde/index.m3u8
-Normal|Live|Notícias|JovemPan-TvFronteira|https://tvfronteira.brasilstream.com.br/hls/tvfronteira/index.m3u8
+Normal|Live|Notícias|zJovem Pan|https://www.youtube.com/watch?v=eTz4XgOQaAE
+Normal|Live|Notícias|zJovemPan - Cidade Verde|https://televisaocidadeverde.brasilstream.com.br/hls/televisaocidadeverde/index.m3u8
+Normal|Live|Notícias|zJovemPan-TvFronteira|https://tvfronteira.brasilstream.com.br/hls/tvfronteira/index.m3u8
     #LiveYoutube
-Normal|Live|Notícias|Record News|https://www.youtube.com/watch?v=TCRFQXkZ8fs
-Normal|Live|Notícias|RS News|https://video07.logicahost.com.br/rsnews01/rsnews01/playlist.m3u8
+Normal|Live|Notícias|zRecord News|https://www.youtube.com/watch?v=TCRFQXkZ8fs
+Normal|Live|Notícias|zRS News|https://video07.logicahost.com.br/rsnews01/rsnews01/playlist.m3u8
     #LiveYoutube
-Normal|Live|Notícias|SBT News|https://www.youtube.com/watch?v=J8ZRQpbPffc
-Normal|Live|Notícias|TCM 10|https://live.tcm10.com.br/tcm10hd/stream.m3u8
+Normal|Live|Notícias|zSBT News|https://www.youtube.com/watch?v=J8ZRQpbPffc
+Normal|Live|Notícias|zTCM 10|https://live.tcm10.com.br/tcm10hd/stream.m3u8
 
 #Agro
 Normal|Live|Agro|Canal do Criador|https://isaocorp.cloudecast.com/rural-canal-do-criador/tracks-v1a1/mono.m3u8
