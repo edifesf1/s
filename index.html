@@ -114,22 +114,22 @@ body.tarja-recolhida>header>#botaoTarja:focus{opacity:1}
   <nav id="cascadeBar" aria-label="Filtros">
     <div class="cascade-group" id="grupoA1"><label for="menuA1">Tema</label><select id="menuA1" title="Tema" aria-label="Tema"><option value=""></option></select></div>
     <div class="cascade-group" id="grupoB2" hidden>
-      <label for="menuB2">Categoria ou pesquisa</label>
-      <select id="menuB2" title="Categoria" aria-label="Categoria">
-        <option value=""></option>
-      </select>
-      <input id="campoPesquisa" type="search"
-        placeholder="Pesquisar conteúdo..."
-        aria-label="Pesquisar canais, filmes, séries e músicas"
-        style="display:none;width:100%;min-width:100px;padding:9px 8px;border-radius:5px;border:1px solid white;background:#a90000;color:white;font-size:14px">
-    </div>
+  <label for="menuB2">Categoria ou pesquisa</label>
+  <select id="menuB2" title="Categoria" aria-label="Categoria">
+    <option value=""></option>
+  </select>
+  <input id="campoPesquisa" type="search"
+    placeholder="Pesquisar conteúdo..."
+    aria-label="Pesquisar canais, filmes, séries e músicas"
+    style="display:none;width:100%;min-width:100px;padding:9px 8px;border-radius:5px;border:1px solid white;background:#a90000;color:white;font-size:14px">
+</div>
 
-    <div class="cascade-group" id="grupoC3" hidden>
-      <label for="menuC3">Resultados</label>
-      <select id="menuC3" title="Resultados" aria-label="Resultados">
-        <option value=""></option>
-      </select>
-    </div>
+<div class="cascade-group" id="grupoC3" hidden>
+  <label for="menuC3">Resultados</label>
+  <select id="menuC3" title="Resultados" aria-label="Resultados">
+    <option value=""></option>
+  </select>
+</div>
     <div class="cascade-group" id="grupoD4" hidden><label for="menuD4">Episódio</label><select id="menuD4" title="Episódio" aria-label="Episódio"><option value=""></option></select></div>
   </nav>
   <div id="navegacaoCanais" aria-label="Navegação entre canais">
@@ -158,10 +158,10 @@ const menuA1 = document.getElementById("menuA1");
 const menuB2 = document.getElementById("menuB2");
 const menuC3 = document.getElementById("menuC3");
 const menuD4 = document.getElementById("menuD4");
-
+  
 const campoPesquisa = document.getElementById("campoPesquisa");
 let modoPesquisa = false;
-
+  
 const grupos = {
   A1:document.getElementById("grupoA1"),
   B2:document.getElementById("grupoB2"),
@@ -181,6 +181,10 @@ function alternarTarja(){
 }
 botaoTarja.addEventListener("click", alternarTarja);
 
+// URL do servidor responsável exclusivamente pelo controle de sessões.
+const URL_SESSOES = "https://script.google.com/macros/s/AKfycbyjEMCft9Z-84Owpfukv4ROvVv3w2Ax4QsyPvULPuk424Ej8Liz8AU5xmQnoLSDMl2b/exec";
+const DEVICE_KEY = "edifesfDeviceId";
+let heartbeatTimer = null;
 let LOGINS_VALIDOS = [];
 let todosVideos = [];
 let videos = [];
@@ -197,13 +201,8 @@ function mostrarTarja(){ tarja.style.visibility="visible"; }
 function ocultarTarja(){ /* A tarja é fixa e não é ocultada. */ }
 
 function registrarFalha(item,tipo,erro,codigo=""){
-  console.warn("Falha de reprodução:", {
-    canal:item?.titulo||"Canal sem nome",
-    tipo,
-    url:item?.url||"",
-    erro:String(erro||"Falha de reprodução"),
-    codigo:String(codigo||"")
-  });
+  // Registro remoto de falhas desativado; mantém apenas diagnóstico no console.
+  console.warn("Falha de reprodução:", {canal:item?.titulo||"Canal sem nome", tipo, url:item?.url||"", erro:String(erro||"Falha de reprodução"), codigo:String(codigo||"")});
 }
 
 function carregarYouTubeAPI(){
@@ -235,80 +234,83 @@ function ativarTelaCheia(){
     }
   }catch(e){console.warn("Tela cheia não autorizada:",e);}
 }
-
-/* Login local: valida somente contra os códigos carregados de LOGINS-200.txt. */
+function obterDeviceId(){
+  let id=localStorage.getItem(DEVICE_KEY);
+  if(!id){id="dev_"+Array.from(crypto.getRandomValues(new Uint8Array(18))).map(n=>n.toString(16).padStart(2,"0")).join("");localStorage.setItem(DEVICE_KEY,id);}
+  return id;
+}
+function chamarControleSessao(action,login){
+  return new Promise((resolve,reject)=>{
+    if(!URL_SESSOES || URL_SESSOES.includes("COLE_AQUI")){reject(new Error("Falta configurar a URL do Apps Script de sessões."));return;}
+    const callback="edifesfCb_"+Date.now()+"_"+Math.floor(Math.random()*1000000);
+    const script=document.createElement("script");
+    const timeout=setTimeout(()=>{limpar();reject(new Error("O servidor de sessões não respondeu."));},12000);
+    function limpar(){clearTimeout(timeout);delete window[callback];script.remove();}
+    window[callback]=(data)=>{limpar();resolve(data);};
+    script.onerror=()=>{limpar();reject(new Error("Não foi possível acessar o servidor de sessões."));};
+    const params=new URLSearchParams({action,login,device:obterDeviceId(),callback,_:String(Date.now())});
+    script.src=URL_SESSOES+"?"+params.toString();document.head.appendChild(script);
+  });
+}
+function pararHeartbeat(){if(heartbeatTimer){clearInterval(heartbeatTimer);heartbeatTimer=null;}}
 function exibirLogin(mensagem){
-  document.body.classList.add("bloqueado");
-  telaLogin.style.display="flex";
+  pararHeartbeat();document.body.classList.add("bloqueado");telaLogin.style.display="flex";
   erroLogin.textContent=mensagem||"Digite seu login de acesso para continuar.";
 }
-
-async function liberarAcesso(login){
-  if(!LOGINS_VALIDOS.includes(login)){
-    erroLogin.textContent="Login inválido. Confira o código e tente novamente.";
-    return false;
-  }
-
-  botaoEntrar.disabled=true;
-  try{
-    document.body.classList.remove("bloqueado");
-    telaLogin.style.display="none";
-    localStorage.setItem("youtubeIptvLogin",login);
-    ativarTelaCheia();
-    return true;
-  }catch(e){
-    console.error("Erro ao liberar o acesso:",e);
-    erroLogin.textContent="Não foi possível liberar o acesso.";
-    return false;
-  }finally{
-    botaoEntrar.disabled=false;
-  }
+function iniciarHeartbeat(login){
+  pararHeartbeat();
+  heartbeatTimer=setInterval(async()=>{
+    try{
+      const resposta=await chamarControleSessao("heartbeat",login);
+      if(!resposta.ok){localStorage.removeItem("youtubeIptvLogin");exibirLogin(resposta.message||"Sua sessão não está mais ativa.");}
+    }catch(e){console.warn("Falha temporária ao renovar sessão:",e);}
+  },30000);
 }
-
+async function liberarAcesso(login){
+  botaoEntrar.disabled=true;erroLogin.textContent="Verificando dispositivo...";
+  try{
+    const resposta=await chamarControleSessao("claim",login);
+    if(!resposta.ok){localStorage.removeItem("youtubeIptvLogin");erroLogin.textContent=resposta.message||"Acesso negado.";return false;}
+    document.body.classList.remove("bloqueado");telaLogin.style.display="none";
+    localStorage.setItem("youtubeIptvLogin",login);ativarTelaCheia();iniciarHeartbeat(login);return true;
+  }catch(e){
+    console.error(e);erroLogin.textContent="Não foi possível verificar o login no servidor. Confira a implantação do Apps Script.";return false;
+  }finally{botaoEntrar.disabled=false;}
+}
 document.addEventListener("click",()=>{if(!document.fullscreenElement)ativarTelaCheia();});
 document.addEventListener("touchend",()=>{if(!document.fullscreenElement)ativarTelaCheia();},{passive:true});
 
 async function carregarLogins(){
-  botaoEntrar.disabled=true;
-  erroLogin.textContent="Carregando logins...";
+  botaoEntrar.disabled=true;erroLogin.textContent="Carregando logins...";
   try{
     const resposta=await fetch("./LOGINS-200.txt?v="+Date.now(),{cache:"no-store"});
     if(!resposta.ok)throw new Error("HTTP "+resposta.status);
     const texto=await resposta.text();
-    LOGINS_VALIDOS=[...new Set(
-      texto.split(/\r?\n/)
-        .map(l=>l.trim().toUpperCase())
-        .filter(l=>/^[A-Z0-9]{6}$/.test(l))
-    )];
+    LOGINS_VALIDOS=[...new Set(texto.split(/\r?\n/).map(l=>l.trim().toUpperCase()).filter(l=>/^[A-Z0-9]{6}$/.test(l)))];
     if(!LOGINS_VALIDOS.length)throw new Error("Nenhum login válido encontrado");
-    erroLogin.textContent="";
-    botaoEntrar.disabled=false;
-    await validarLoginSalvo();
+    erroLogin.textContent="";botaoEntrar.disabled=false;await validarLoginSalvo();
   }catch(e){
     console.error("Erro ao carregar LOGINS-200.txt:",e);
     erroLogin.textContent="Não foi possível carregar os logins. Verifique se LOGINS-200.txt está publicado no GitHub.";
   }
 }
-
 async function validarLoginSalvo(){
   const salvo=localStorage.getItem("youtubeIptvLogin");
   if(salvo&&LOGINS_VALIDOS.includes(salvo)){
-    await liberarAcesso(salvo);
-  }else{
-    localStorage.removeItem("youtubeIptvLogin");
-    exibirLogin("Digite seu login de acesso para continuar.");
-  }
+    const ok=await liberarAcesso(salvo);
+    if(!ok && erroLogin.textContent.includes("já está em uso")) localStorage.removeItem("youtubeIptvLogin");
+  } else {localStorage.removeItem("youtubeIptvLogin");exibirLogin("Digite seu login de acesso para continuar.");}
 }
-
 document.getElementById("caixaLogin").addEventListener("submit",async e=>{
-  e.preventDefault();
-  const login=campoLogin.value.trim().toUpperCase();
-  if(!LOGINS_VALIDOS.includes(login)){
-    erroLogin.textContent="Login inválido. Confira o código e tente novamente.";
-    campoLogin.select();
-    return;
-  }
+  e.preventDefault();const login=campoLogin.value.trim().toUpperCase();
+  if(!LOGINS_VALIDOS.includes(login)){erroLogin.textContent="Login inválido. Confira o código e tente novamente.";campoLogin.select();return;}
   await liberarAcesso(login);
+});
+window.addEventListener("beforeunload",()=>{
+  const login=localStorage.getItem("youtubeIptvLogin");
+  if(login && URL_SESSOES && !URL_SESSOES.includes("COLE_AQUI")){
+    const img=new Image();img.src=URL_SESSOES+"?action=release&login="+encodeURIComponent(login)+"&device="+encodeURIComponent(obterDeviceId())+"&_="+Date.now();
+  }
 });
 
 function atualizarBotoesNavegacao(){botaoCanalAnterior.disabled=botaoProximoCanal.disabled=videos.length<=1;}
@@ -357,22 +359,21 @@ function aplicarFiltros(){
   if(episodio||!player)criarPlayer();
 }
 menuA1.addEventListener("change",()=>{
-  limparAbaixo(1);
-  const tema=menuA1.value;
-  if(tema==="Pesquisa"){
-    ativarPesquisa(true);
-    videos=[];
-    atualizarBotoesNavegacao();
-    document.getElementById("player").replaceChildren();
-    return;
-  }
-  ativarPesquisa(false);
+  limparAbaixo(1);const tema=menuA1.value;
+  if (tema === "Pesquisa") {
+  ativarPesquisa(true);
+  videos = [];
+  atualizarBotoesNavegacao();
+  document.getElementById("player").replaceChildren();
+  return;
+}
+
+ativarPesquisa(false);
   if(tema){preencherSelect(menuB2,todosVideos.filter(v=>v.tema===tema).map(v=>v.categoria));mostrarGrupo("B2",true);}
   aplicarFiltros();
 });
 menuB2.addEventListener("change",()=>{
-  limparAbaixo(2);
-  const tema=menuA1.value,categoria=menuB2.value;
+  limparAbaixo(2);const tema=menuA1.value,categoria=menuB2.value;
   if(tema&&categoria){preencherSelect(menuC3,todosVideos.filter(v=>v.tema===tema&&v.categoria===categoria).map(v=>v.classificacao));mostrarGrupo("C3",true);}
   aplicarFiltros();
 });
@@ -385,6 +386,7 @@ menuC3.addEventListener("change",()=>{
     criarPlayer();
     return;
   }
+
   limparAbaixo(3);
   const tema=menuA1.value,categoria=menuB2.value,classificacao=menuC3.value;
   if(tema&&categoria&&classificacao){
@@ -403,62 +405,77 @@ function limparPlayerPesquisa(){
   player=null;
 }
 
-function ativarPesquisa(ativar){
-  modoPesquisa=ativar;
-  campoPesquisa.style.display=ativar?"block":"none";
-  menuB2.style.display=ativar?"none":"";
-  mostrarGrupo("B2",ativar);
-  mostrarGrupo("C3",ativar);
-  mostrarGrupo("D4",false);
-  if(ativar){
+function ativarPesquisa(ativar) {
+  modoPesquisa = ativar;
+  campoPesquisa.style.display = ativar ? "block" : "none";
+  menuB2.style.display = ativar ? "none" : "";
+  mostrarGrupo("B2", ativar);
+  mostrarGrupo("C3", ativar);
+  mostrarGrupo("D4", false);
+
+  if (ativar) {
     limparPlayerPesquisa();
-    videos=[];
-    selecionado=0;
-    campoPesquisa.value="";
+    videos = [];
+    selecionado = 0;
+    campoPesquisa.value = "";
     menuC3.replaceChildren();
-    const opcao=document.createElement("option");
-    opcao.value="";
-    opcao.textContent="Digite para pesquisar";
+    const opcao = document.createElement("option");
+    opcao.value = "";
+    opcao.textContent = "Digite para pesquisar";
     menuC3.appendChild(opcao);
-    menuC3.disabled=true;
+    menuC3.disabled = true;
     atualizarBotoesNavegacao();
-    status.textContent="Digite o nome de um canal ou conteúdo.";
+    status.textContent = "Digite o nome de um canal ou conteúdo.";
     campoPesquisa.focus();
-  }else{
-    menuC3.disabled=false;
-    campoPesquisa.value="";
+  } else {
+    menuC3.disabled = false;
+    campoPesquisa.value = "";
   }
 }
 
-function pesquisarConteudo(){
-  if(!modoPesquisa)return;
-  const termo=campoPesquisa.value.trim().toLocaleLowerCase("pt-BR");
-  const encontrados=termo
-    ?todosVideos.filter(v=>[v.classificacao,v.titulo].some(valor=>String(valor||"").toLocaleLowerCase("pt-BR").includes(termo)))
-    :[];
+function pesquisarConteudo() {
+  if (!modoPesquisa) return;
+
+  const termo = campoPesquisa.value.trim().toLocaleLowerCase("pt-BR");
+  // A pesquisa considera somente os dois últimos campos: classificação (C3) e título (D4).
+  const encontrados = termo
+    ? todosVideos.filter(v =>
+        [v.classificacao, v.titulo]
+          .some(valor => String(valor || "").toLocaleLowerCase("pt-BR").includes(termo))
+      )
+    : [];
+
+  // Ao mudar a busca, interrompe o conteúdo anterior para não deixar um vídeo antigo tocando.
   limparPlayerPesquisa();
-  videos=encontrados;
-  selecionado=0;
+  videos = encontrados;
+  selecionado = 0;
   menuC3.replaceChildren();
-  const inicial=document.createElement("option");
-  inicial.value="";
-  inicial.textContent=termo
-    ?(encontrados.length?`${encontrados.length} resultado(s) encontrado(s)`:"Nenhum resultado encontrado")
-    :"Digite para pesquisar";
+
+  const inicial = document.createElement("option");
+  inicial.value = "";
+  inicial.textContent = termo
+    ? (encontrados.length
+        ? `${encontrados.length} resultado(s) encontrado(s)`
+        : "Nenhum resultado encontrado")
+    : "Digite para pesquisar";
   menuC3.appendChild(inicial);
-  encontrados.forEach((video,indice)=>{
-    const opcao=document.createElement("option");
-    opcao.value=String(indice);
-    opcao.textContent=[video.classificacao,video.titulo].filter(Boolean).join(" - ");
+
+  encontrados.forEach((video, indice) => {
+    const opcao = document.createElement("option");
+    opcao.value = String(indice);
+    // Mostra juntos os campos C3 e D4 no resultado.
+    opcao.textContent = [video.classificacao, video.titulo].filter(Boolean).join(" - ");
     menuC3.appendChild(opcao);
   });
-  menuC3.disabled=encontrados.length===0;
+
+  menuC3.disabled = encontrados.length === 0;
   atualizarBotoesNavegacao();
-  status.textContent=encontrados.length
-    ?`${encontrados.length} resultado(s). Selecione um conteúdo para reproduzir.`
-    :(termo?"Nenhum conteúdo corresponde à pesquisa.":"Digite o nome de um canal ou conteúdo.");
+  status.textContent = encontrados.length
+    ? `${encontrados.length} resultado(s). Selecione um conteúdo para reproduzir.`
+    : (termo ? "Nenhum conteúdo corresponde à pesquisa." : "Digite o nome de um canal ou conteúdo.");
 }
-campoPesquisa.addEventListener("input",pesquisarConteudo);
+
+campoPesquisa.addEventListener("input", pesquisarConteudo);
 
 function extrairId(valor){
   try{
@@ -479,6 +496,7 @@ function criarPlayer(){
   if(ytPlayerApi){try{ytPlayerApi.destroy();}catch(e){}ytPlayerApi=null;}
   if(hlsInstance){try{hlsInstance.destroy();}catch(e){}hlsInstance=null;}
   area.replaceChildren();player=null;
+
   if(item.tipo==="hls"||/\.m3u8(?:$|[?#])/i.test(item.url)){
     const videoEl=document.createElement("video");
     videoEl.title=item.titulo;videoEl.controls=true;videoEl.autoplay=true;videoEl.playsInline=true;videoEl.preload="metadata";
@@ -508,6 +526,7 @@ function criarPlayer(){
     }else status.textContent="Este navegador não oferece suporte à reprodução HLS.";
     return;
   }
+
   const container=document.createElement("div");container.id="youtube-player-container-"+geracao;
   container.style.cssText="width:100%;height:100%;background:#000;";area.appendChild(container);
   status.textContent="Carregando player do YouTube…";
@@ -555,27 +574,25 @@ async function carregarLista(){
       if(tipo==="hls")return{tema,categoria,classificacao,titulo,id:null,url,tipo};
       return id?{tema,categoria,classificacao,titulo,id,url,tipo}:null;
     }).filter(Boolean);
-    const temas=[...new Set(todosVideos.map(v=>v.tema).filter(Boolean))]
-      .filter(tema=>tema!=="Pesquisa")
-      .sort((a,b)=>a.localeCompare(b,"pt-BR"));
+    // "Pesquisa" fica sempre como primeira opção; os temas vêm depois em ordem alfabética.
+    const temas = [...new Set(todosVideos.map(v => v.tema).filter(Boolean))]
+      .filter(tema => tema !== "Pesquisa")
+      .sort((a, b) => a.localeCompare(b, "pt-BR"));
     menuA1.replaceChildren();
-    const opcaoPesquisa=document.createElement("option");
-    opcaoPesquisa.value="Pesquisa";
-    opcaoPesquisa.textContent="Pesquisa";
+    const opcaoPesquisa = document.createElement("option");
+    opcaoPesquisa.value = "Pesquisa";
+    opcaoPesquisa.textContent = "Pesquisa";
     menuA1.appendChild(opcaoPesquisa);
-    temas.forEach(tema=>{
-      const opcao=document.createElement("option");
-      opcao.value=tema;
-      opcao.textContent=tema;
+    temas.forEach(tema => {
+      const opcao = document.createElement("option");
+      opcao.value = tema;
+      opcao.textContent = tema;
       menuA1.appendChild(opcao);
     });
-    menuA1.value="";
+    menuA1.value = "";
     limparAbaixo(1);
     aplicarFiltros();
-  }catch(erro){
-    console.error(erro);
-    status.textContent="Erro ao ler youtube.txt. Verifique se o arquivo está publicado no GitHub Pages.";
-  }
+  }catch(erro){console.error(erro);status.textContent="Erro ao ler youtube.txt. Verifique se o arquivo está publicado no GitHub Pages.";}
 }
 
 carregarLogins();
