@@ -182,9 +182,13 @@ function alternarTarja(){
 botaoTarja.addEventListener("click", alternarTarja);
 
 // URL do servidor responsável exclusivamente pelo controle de sessões.
-const URL_SESSOES = "https://script.google.com/macros/s/AKfycbyjEMCft9Z-84Owpfukv4ROvVv3w2Ax4QsyPvULPuk424Ej8Liz8AU5xmQnoLSDMl2b/exec";
-const DEVICE_KEY = "edifesfDeviceId";
-let heartbeatTimer = null;
+// ================================================================
+// FUNÇÕES/CAMPOS ABAIXO NÃO EXISTEM NO index_s.html:
+// Configuração do Apps Script para controle remoto de sessões.
+// ================================================================
+// const URL_SESSOES = "https://script.google.com/macros/s/AKfycbyjEMCft9Z-84Owpfukv4ROvVv3w2Ax4QsyPvULPuk424Ej8Liz8AU5xmQnoLSDMl2b/exec";
+// const DEVICE_KEY = "edifesfDeviceId";
+// let heartbeatTimer = null;
 let LOGINS_VALIDOS = [];
 let todosVideos = [];
 let videos = [];
@@ -234,84 +238,144 @@ function ativarTelaCheia(){
     }
   }catch(e){console.warn("Tela cheia não autorizada:",e);}
 }
-function obterDeviceId(){
-  let id=localStorage.getItem(DEVICE_KEY);
-  if(!id){id="dev_"+Array.from(crypto.getRandomValues(new Uint8Array(18))).map(n=>n.toString(16).padStart(2,"0")).join("");localStorage.setItem(DEVICE_KEY,id);}
-  return id;
-}
-function chamarControleSessao(action,login){
-  return new Promise((resolve,reject)=>{
-    if(!URL_SESSOES || URL_SESSOES.includes("COLE_AQUI")){reject(new Error("Falta configurar a URL do Apps Script de sessões."));return;}
-    const callback="edifesfCb_"+Date.now()+"_"+Math.floor(Math.random()*1000000);
-    const script=document.createElement("script");
-    const timeout=setTimeout(()=>{limpar();reject(new Error("O servidor de sessões não respondeu."));},12000);
-    function limpar(){clearTimeout(timeout);delete window[callback];script.remove();}
-    window[callback]=(data)=>{limpar();resolve(data);};
-    script.onerror=()=>{limpar();reject(new Error("Não foi possível acessar o servidor de sessões."));};
-    const params=new URLSearchParams({action,login,device:obterDeviceId(),callback,_:String(Date.now())});
-    script.src=URL_SESSOES+"?"+params.toString();document.head.appendChild(script);
-  });
-}
-function pararHeartbeat(){if(heartbeatTimer){clearInterval(heartbeatTimer);heartbeatTimer=null;}}
+// FUNÇÃO AUSENTE NO index_s.html:
+// Cria e salva um identificador persistente para este dispositivo.
+//function obterDeviceId(){
+//  let id=localStorage.getItem(DEVICE_KEY);
+//  if(!id){id="dev_"+Array.from(crypto.getRandomValues(new Uint8Array(18))).map(n=>n.toString(16).padStart(2,"0")).join("");localStorage.setItem(DEVICE_KEY,id);}
+//  return id;
+//}
+// FUNÇÃO AUSENTE NO index_s.html:
+// Consulta o Apps Script para reivindicar, renovar ou liberar uma sessão.
+//function chamarControleSessao(action,login){
+//  return new Promise((resolve,reject)=>{
+//    if(!URL_SESSOES || URL_SESSOES.includes("COLE_AQUI")){reject(new Error("Falta configurar a URL do Apps Script de sessões."));return;}
+//    const callback="edifesfCb_"+Date.now()+"_"+Math.floor(Math.random()*1000000);
+//    const script=document.createElement("script");
+//    const timeout=setTimeout(()=>{limpar();reject(new Error("O servidor de sessões não respondeu."));},12000);
+//    function limpar(){clearTimeout(timeout);delete window[callback];script.remove();}
+//    window[callback]=(data)=>{limpar();resolve(data);};
+//    script.onerror=()=>{limpar();reject(new Error("Não foi possível acessar o servidor de sessões."));};
+//    const params=new URLSearchParams({action,login,device:obterDeviceId(),callback,_:String(Date.now())});
+//    script.src=URL_SESSOES+"?"+params.toString();document.head.appendChild(script);
+//  });
+//}
+// FUNÇÃO AUSENTE NO index_s.html:
+// Interrompe a verificação periódica da sessão ativa.
+//function pararHeartbeat(){if(heartbeatTimer){clearInterval(heartbeatTimer);heartbeatTimer=null;}}
 function exibirLogin(mensagem){
-  pararHeartbeat();document.body.classList.add("bloqueado");telaLogin.style.display="flex";
+	// a linha abaixo ausente no index_s.html
+  //pararHeartbeat();
+  document.body.classList.add("bloqueado");
+  telaLogin.style.display="flex";
   erroLogin.textContent=mensagem||"Digite seu login de acesso para continuar.";
 }
-function iniciarHeartbeat(login){
-  pararHeartbeat();
-  heartbeatTimer=setInterval(async()=>{
-    try{
-      const resposta=await chamarControleSessao("heartbeat",login);
-      if(!resposta.ok){localStorage.removeItem("youtubeIptvLogin");exibirLogin(resposta.message||"Sua sessão não está mais ativa.");}
-    }catch(e){console.warn("Falha temporária ao renovar sessão:",e);}
-  },30000);
-}
+
+// FUNÇÃO AUSENTE NO index_s.html:
+// A cada 30 segundos confirma com o servidor se a sessão continua válida.
+//function iniciarHeartbeat(login){
+//  pararHeartbeat();
+//  heartbeatTimer=setInterval(async()=>{
+//    try{
+//      const resposta=await chamarControleSessao("heartbeat",login);
+//      if(!resposta.ok){localStorage.removeItem("youtubeIptvLogin");exibirLogin(resposta.message||"Sua sessão não está mais ativa.");}
+//    }catch(e){console.warn("Falha temporária ao renovar sessão:",e);}
+//  },30000);
+//}
+
+// VERSÃO DIFERENTE DA FUNÇÃO no index_s.html:
+// Aqui o login depende do Apps Script e do dispositivo autorizado; no index_s,
+// a validação é local, usando apenas LOGINS-200.txt.
+//async function liberarAcesso(login){
+//  botaoEntrar.disabled=true;erroLogin.textContent="Verificando dispositivo...";
+//  try{
+//    const resposta=await chamarControleSessao("claim",login);
+//    if(!resposta.ok){localStorage.removeItem("youtubeIptvLogin");erroLogin.textContent=resposta.message||"Acesso negado.";return false;}
+//    document.body.classList.remove("bloqueado");telaLogin.style.display="none";
+//    localStorage.setItem("youtubeIptvLogin",login);ativarTelaCheia();iniciarHeartbeat(login);return true;
+//  }catch(e){
+//    console.error(e);erroLogin.textContent="Não foi possível verificar o login no servidor. Confira a implantação do Apps Script.";return false;
+//  }finally{botaoEntrar.disabled=false;}
+//}
+
+// função liberarAcesso(login) - alterada
 async function liberarAcesso(login){
-  botaoEntrar.disabled=true;erroLogin.textContent="Verificando dispositivo...";
+  if(!LOGINS_VALIDOS.includes(login)){
+    erroLogin.textContent="Login inválido. Confira o código e tente novamente.";
+    return false;
+  }
+
+  botaoEntrar.disabled=true;
   try{
-    const resposta=await chamarControleSessao("claim",login);
-    if(!resposta.ok){localStorage.removeItem("youtubeIptvLogin");erroLogin.textContent=resposta.message||"Acesso negado.";return false;}
-    document.body.classList.remove("bloqueado");telaLogin.style.display="none";
-    localStorage.setItem("youtubeIptvLogin",login);ativarTelaCheia();iniciarHeartbeat(login);return true;
+    document.body.classList.remove("bloqueado");
+    telaLogin.style.display="none";
+    localStorage.setItem("youtubeIptvLogin",login);
+    ativarTelaCheia();
+    return true;
   }catch(e){
-    console.error(e);erroLogin.textContent="Não foi possível verificar o login no servidor. Confira a implantação do Apps Script.";return false;
-  }finally{botaoEntrar.disabled=false;}
+    console.error("Erro ao liberar o acesso:",e);
+    erroLogin.textContent="Não foi possível liberar o acesso.";
+    return false;
+  }finally{
+    botaoEntrar.disabled=false;
+  }
 }
+// FIM DA função liberarAcesso(login) - alterada
+
 document.addEventListener("click",()=>{if(!document.fullscreenElement)ativarTelaCheia();});
 document.addEventListener("touchend",()=>{if(!document.fullscreenElement)ativarTelaCheia();},{passive:true});
 
 async function carregarLogins(){
-  botaoEntrar.disabled=true;erroLogin.textContent="Carregando logins...";
+  botaoEntrar.disabled=true;
+  erroLogin.textContent="Carregando logins...";
   try{
     const resposta=await fetch("./LOGINS-200.txt?v="+Date.now(),{cache:"no-store"});
     if(!resposta.ok)throw new Error("HTTP "+resposta.status);
     const texto=await resposta.text();
-    LOGINS_VALIDOS=[...new Set(texto.split(/\r?\n/).map(l=>l.trim().toUpperCase()).filter(l=>/^[A-Z0-9]{6}$/.test(l)))];
+    LOGINS_VALIDOS=[...new Set(
+		texto.split(/\r?\n/)
+			.map(l=>l.trim().toUpperCase())
+				.filter(l=>/^[A-Z0-9]{6}$/.test(l))
+	)];
     if(!LOGINS_VALIDOS.length)throw new Error("Nenhum login válido encontrado");
-    erroLogin.textContent="";botaoEntrar.disabled=false;await validarLoginSalvo();
+    erroLogin.textContent="";
+	botaoEntrar.disabled=false;
+	await validarLoginSalvo();
   }catch(e){
     console.error("Erro ao carregar LOGINS-200.txt:",e);
-    erroLogin.textContent="Não foi possível carregar os logins. Verifique se LOGINS-200.txt está publicado no GitHub.";
+    erroLogin.textContent="Não foi possível carregar os logins.";
   }
 }
 async function validarLoginSalvo(){
   const salvo=localStorage.getItem("youtubeIptvLogin");
   if(salvo&&LOGINS_VALIDOS.includes(salvo)){
     const ok=await liberarAcesso(salvo);
-    if(!ok && erroLogin.textContent.includes("já está em uso")) localStorage.removeItem("youtubeIptvLogin");
-  } else {localStorage.removeItem("youtubeIptvLogin");exibirLogin("Digite seu login de acesso para continuar.");}
+    // CONDIÇÃO EXTRA AUSENTE NO index_s.html:
+    // Se o servidor informar que o login já está em uso, remove o login salvo.
+    //if(!ok && erroLogin.textContent.includes("já está em uso")) localStorage.removeItem("youtubeIptvLogin");
+  } else {
+	localStorage.removeItem("youtubeIptvLogin");
+	exibirLogin("Digite seu login de acesso para continuar.");
+	}
 }
+
 document.getElementById("caixaLogin").addEventListener("submit",async e=>{
-  e.preventDefault();const login=campoLogin.value.trim().toUpperCase();
-  if(!LOGINS_VALIDOS.includes(login)){erroLogin.textContent="Login inválido. Confira o código e tente novamente.";campoLogin.select();return;}
+  e.preventDefault();
+  const login=campoLogin.value.trim().toUpperCase();
+  if(!LOGINS_VALIDOS.includes(login)){erroLogin.textContent="Login inválido. Confira o código e tente novamente.";
+  campoLogin.select();
+  return;
+  }
   await liberarAcesso(login);
 });
-window.addEventListener("beforeunload",()=>{
-  const login=localStorage.getItem("youtubeIptvLogin");
-  if(login && URL_SESSOES && !URL_SESSOES.includes("COLE_AQUI")){
-    const img=new Image();img.src=URL_SESSOES+"?action=release&login="+encodeURIComponent(login)+"&device="+encodeURIComponent(obterDeviceId())+"&_="+Date.now();
-  }
-});
+// BLOCO AUSENTE NO index_s.html:
+// Ao sair/recarregar a página, tenta avisar o Apps Script para liberar a sessão.
+//window.addEventListener("beforeunload",()=>{
+//  const login=localStorage.getItem("youtubeIptvLogin");
+//  if(login && URL_SESSOES && !URL_SESSOES.includes("COLE_AQUI")){
+//    const img=new Image();img.src=URL_SESSOES+"?action=release&login="+encodeURIComponent(login)+"&device="+encodeURIComponent(obterDeviceId())+"&_="+Date.now();
+//  }
+//});
 
 function atualizarBotoesNavegacao(){botaoCanalAnterior.disabled=botaoProximoCanal.disabled=videos.length<=1;}
 function navegarCanal(direcao){
@@ -359,7 +423,8 @@ function aplicarFiltros(){
   if(episodio||!player)criarPlayer();
 }
 menuA1.addEventListener("change",()=>{
-  limparAbaixo(1);const tema=menuA1.value;
+  limparAbaixo(1);
+  const tema=menuA1.value;
   if (tema === "Pesquisa") {
   ativarPesquisa(true);
   videos = [];
@@ -435,7 +500,6 @@ function ativarPesquisa(ativar) {
 
 function pesquisarConteudo() {
   if (!modoPesquisa) return;
-
   const termo = campoPesquisa.value.trim().toLocaleLowerCase("pt-BR");
   // A pesquisa considera somente os dois últimos campos: classificação (C3) e título (D4).
   const encontrados = termo
