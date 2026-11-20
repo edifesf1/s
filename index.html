@@ -1,405 +1,131 @@
-
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#10131c">
-<title>EdifesfPlayerHLSM3U8</title>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/artplayer@5.4.0/dist/artplayer.css">
-
-<style>
-:root {
-  color-scheme: dark;
-  --bg: #0b0e15;
-  --panel: #151a26;
-  --line: #293246;
-  --text: #f1f4fb;
-  --muted: #9ca9bd;
-  --accent: #e8bd45;
-}
-
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  background: radial-gradient(ellipse at 50% 0,#1a2437 0,var(--bg) 58%);
-  color: var(--text);
-  font-family: Arial, Helvetica, sans-serif;
-  min-height: 100vh;
-}
-
-.wrap {
-  width: min(1120px,94%);
-  margin: auto;
-  padding: 26px 0 40px;
-}
-
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 20px;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo {
-  width: 44px;
-  height: 44px;
-  border-radius: 13px;
-  background: var(--accent);
-  color: #171717;
-  display: grid;
-  place-items: center;
-  font-size: 22px;
-  font-weight: 900;
-}
-
-h1 {
-  font-size: clamp(20px,4vw,28px);
-  margin: 0;
-}
-
-.sub {
-  color: var(--muted);
-  font-size: 13px;
-  margin-top: 4px;
-}
-
-.pill {
-  border: 1px solid #65552b;
-  color: var(--accent);
-  border-radius: 99px;
-  padding: 7px 11px;
-  font-size: 12px;
-  white-space: nowrap;
-}
-
-.panel {
-  background: #151a26ed;
-  border: 1px solid var(--line);
-  border-radius: 17px;
-  padding: 18px;
-  box-shadow: 0 18px 50px #0005;
-}
-
-.urlrow {
-  display: flex;
-  gap: 10px;
-}
-
-input, select, button {
-  font: inherit;
-  color: var(--text);
-  background: #0c111c;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  min-height: 44px;
-  padding: 0 13px;
-}
-
-input {
-  flex: 1;
-  min-width: 0;
-}
-
-button {
-  cursor: pointer;
-  font-weight: 700;
-}
-
-button:hover {
-  filter: brightness(1.12);
-}
-
-.primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #171717;
-  padding: 0 20px;
-}
-
-.secondary {
-  background: #202a3b;
-}
-
-.hint {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.5;
-  margin: 9px 2px 0;
-}
-
-.player-frame {
-  margin-top: 17px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  overflow: hidden;
-  background: #000;
-}
-
-#player {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16/9;
-  background: #000;
-}
-
-.status {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-height: 38px;
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #8c97a9;
-  flex-shrink: 0;
-}
-
-.dot.ok { background: #6bd5a1; }
-.dot.err { background: #ff7777; }
-
-.tools {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.tools label {
-  display: block;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.tools select {
-  width: 100%;
-  margin-top: 6px;
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
-  margin-top: 14px;
-}
-
-.diag {
-  margin-top: 16px;
-  border: 1px solid var(--line);
-  border-radius: 11px;
-  overflow: hidden;
-  background: #0c111c;
-}
-
-.diag summary {
-  padding: 12px 14px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: bold;
-}
-
-pre {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  color: #b8c7dc;
-  font: 12px/1.5 Consolas,monospace;
-  padding: 0 14px 14px;
-  margin: 0;
-  max-height: 230px;
-  overflow: auto;
-}
-
-.note {
-  font-size: 12px;
-  line-height: 1.55;
-  color: var(--muted);
-  margin-top: 15px;
-}
-
-@media(max-width:650px) {
-  .wrap { padding-top: 17px; }
-  .pill { display: none; }
-  .panel { padding: 13px; }
-  .urlrow { flex-direction: column; }
-  .urlrow button { width: 100%; }
-  .tools { grid-template-columns: 1fr; }
-  #player { aspect-ratio: 16/9; }
-}
-
-/* MODO EMBED */
-
-html.embed-mode,
-html.embed-mode body {
-  width: 100%;
-  height: 100%;
-  min-height: 100%;
-  margin: 0;
-  overflow: hidden;
-  background: #000;
-}
-
-body.embed-mode .wrap {
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  margin: 0;
-}
-
-body.embed-mode header,
-body.embed-mode .urlrow,
-body.embed-mode .hint,
-body.embed-mode .status,
-body.embed-mode .tools,
-body.embed-mode .actions,
-body.embed-mode .diag,
-body.embed-mode .note {
-  display: none !important;
-}
-
-body.embed-mode .panel {
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  margin: 0;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  background: #000;
-}
-
-body.embed-mode .player-frame {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  border: 0;
-  border-radius: 0;
-}
-
-body.embed-mode #player {
-  width: 100%;
-  height: 100%;
-  aspect-ratio: auto;
-}
-</style>
-</head>
-
-<body>
-
-<main class="wrap">
-
-<header>
-  <div class="brand">
-    <div class="logo">▶</div>
-    <div>
-      <h1>EdifesfPlayer</h1>
-      <div class="sub">Reprodutor HLS / M3U8 com ArtPlayer</div>
-    </div>
-  </div>
-
-  <span class="pill">ArtPlayer 5.4.0 · HLS.js 1.7.4</span>
-</header>
-
-<section class="panel">
-
-  <div class="urlrow">
-    <input id="url"
-      type="url"
-      placeholder="Cole aqui o endereço M3U8"
-      autocomplete="url"
-      spellcheck="false">
-
-    <button class="primary" id="play">▶ Reproduzir</button>
-  </div>
-
-  <div class="hint">
-    Cole uma URL direta de vídeo M3U8.
-    Também é possível abrir o player passando ?url=ENDERECO na URL da página.
-  </div>
-
-  <div class="player-frame">
-    <div id="player"></div>
-  </div>
-
-  <div class="status">
-    <span id="dot" class="dot"></span>
-    <span id="status">Aguardando endereço de transmissão.</span>
-  </div>
-
-  <div class="tools">
-
-    <label>
-      Qualidade da transmissão
-      <select id="quality" disabled>
-        <option value="-1">Automática</option>
-      </select>
-    </label>
-
-    <label>
-      Faixa de áudio
-      <select id="audio" disabled>
-        <option value="-1">Padrão</option>
-      </select>
-    </label>
-
-    <label>
-      Legendas
-      <select id="subtitles" disabled>
-        <option value="-1">Desativadas</option>
-      </select>
-    </label>
-
-    <label>
-      Velocidade
-      <select id="speed">
-        <option value="1">1.0x</option>
-        <option value="0.5">0.5x</option>
-        <option value="0.75">0.75x</option>
-        <option value="1.25">1.25x</option>
-        <option value="1.5">1.5x</option>
-        <option value="2">2.0x</option>
-      </select>
-    </label>
-
-  </div>
-
-  <div class="actions">
-    <button class="secondary" id="reload">↻ Recarregar</button>
-    <button class="secondary" id="copy">Copiar URL</button>
-    <button class="secondary" id="open">Abrir fonte em nova aba</button>
-  </div>
-
-  <details class="diag">
-    <summary>Diagnóstico de reprodução</summary>
-    <pre id="log">Nenhum evento registrado.</pre>
-  </details>
-
-  <div class="note">
-    ArtPlayer controla a interface e HLS.js processa as transmissões.
-    A reprodução depende também das permissões CORS e das condições
-    do servidor de origem.
-  </div>
-
-</section>
-</main>
-
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1.7.4/dist/hls.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/artplayer@5.4.0/dist/artplayer.js"></script>
-
-<script type="module" src="./scripts/app.js"></script>
-
-</body>
-</html>
+<!doctype html>
+ <html lang="pt" dir="ltr">
+ <head>
+ <meta charset="UTF-8">
+ <script id="language-config" type="application/json">{"defaultLocale":"en","locale":"pt","suffix":"","languages":[{"code":"ar","name":"العربية","path":"/ar/"},{"code":"de","name":"Deutsch","path":"/de/"},{"code":"en","name":"English","path":"/"},{"code":"es","name":"Español","path":"/es/"},{"code":"fr","name":"Français","path":"/fr/"},{"code":"hi","name":"हिन्दी","path":"/hi/"},{"code":"id","name":"Bahasa Indonesia","path":"/id/"},{"code":"it","name":"Italiano","path":"/it/"},{"code":"ja","name":"日本語","path":"/ja/"},{"code":"ko","name":"한국어","path":"/ko/"},{"code":"pt","name":"Português","path":"/pt/"},{"code":"ru","name":"Русский","path":"/ru/"},{"code":"th","name":"ไทย","path":"/th/"},{"code":"tr","name":"Türkçe","path":"/tr/"},{"code":"vi","name":"Tiếng Việt","path":"/vi/"},{"code":"zh-CN","name":"简体中文","path":"/zh-cn/"},{"code":"zh-TW","name":"繁體中文","path":"/zh-tw/"}]}</script>
+ <script src="./scripts/original/language.1e7ea69ea6edd779.js"></script><!-- Google Tag Manager -->
+ <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+ new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+ 'https\://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+ })(window,document,'script','dataLayer','GTM-5ZCCF4JX');</script>
+ <!-- End Google Tag Manager -->
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <meta name="referrer" content="no-referrer">
+ <title>Reprodutor M3U8 online grátis - HLS ao vivo e sob demanda</title>
+ <meta name="description" content="Reprodutor M3U8 online gratuito para HLS ao vivo e sob demanda, MP4, WebM e vídeos locais. Oferece listas de reprodução, ajustes de atraso e estilo das legendas, velocidade de reprodução e picture-in-picture. O histórico de reprodução online e o progresso dos vídeos sob demanda ficam salvos no navegador, com backup e restauração. Vídeos e legendas locais não precisam ser enviados.">
+ <meta name="keywords" content="player M3U8,player HLS,reprodutor de vídeo online,vídeo ao vivo,MP4,legendas">
+ <meta property="og:type" content="website">
+ <meta property="og:site_name" content="M3U8">
+ <meta property="og:title" content="Reprodutor M3U8 online grátis - HLS ao vivo e sob demanda">
+ <meta property="og:description" content="Reprodutor M3U8 online gratuito para HLS ao vivo e sob demanda, MP4, WebM e vídeos locais. Oferece listas de reprodução, ajustes de atraso e estilo das legendas, velocidade de reprodução e picture-in-picture. O histórico de reprodução online e o progresso dos vídeos sob demanda ficam salvos no navegador, com backup e restauração. Vídeos e legendas locais não precisam ser enviados.">
+ <meta property="og:locale" content="pt_BR">
+ <link rel="canonical" href="https://m3u8-player.com/pt/">
+ <meta property="og:url" content="https\://m3u8-player.com/pt/">
+ <link rel="alternate" hreflang="ar" href="https://m3u8-player.com/ar/">
+ <link rel="alternate" hreflang="de" href="https://m3u8-player.com/de/">
+ <link rel="alternate" hreflang="en" href="https://m3u8-player.com/">
+ <link rel="alternate" hreflang="es" href="https://m3u8-player.com/es/">
+ <link rel="alternate" hreflang="fr" href="https://m3u8-player.com/fr/">
+ <link rel="alternate" hreflang="hi" href="https://m3u8-player.com/hi/">
+ <link rel="alternate" hreflang="id" href="https://m3u8-player.com/id/">
+ <link rel="alternate" hreflang="it" href="https://m3u8-player.com/it/">
+ <link rel="alternate" hreflang="ja" href="https://m3u8-player.com/ja/">
+ <link rel="alternate" hreflang="ko" href="https://m3u8-player.com/ko/">
+ <link rel="alternate" hreflang="pt" href="https://m3u8-player.com/pt/">
+ <link rel="alternate" hreflang="ru" href="https://m3u8-player.com/ru/">
+ <link rel="alternate" hreflang="th" href="https://m3u8-player.com/th/">
+ <link rel="alternate" hreflang="tr" href="https://m3u8-player.com/tr/">
+ <link rel="alternate" hreflang="vi" href="https://m3u8-player.com/vi/">
+ <link rel="alternate" hreflang="zh-CN" href="https://m3u8-player.com/zh-cn/">
+ <link rel="alternate" hreflang="zh-TW" href="https://m3u8-player.com/zh-tw/">
+ <link rel="alternate" hreflang="x-default" href="https://m3u8-player.com/">
+ <script type="application/ld+json">{"@context":"https\://schema.org","@type":"WebApplication","name":"Player M3U8","url":"https\://m3u8-player.com/pt/","inLanguage":"pt","description":"Reprodutor M3U8 online gratuito para HLS ao vivo e sob demanda, MP4, WebM e vídeos locais. Oferece listas de reprodução, ajustes de atraso e estilo das legendas, velocidade de reprodução e picture-in-picture. O histórico de reprodução online e o progresso dos vídeos sob demanda ficam salvos no navegador, com backup e restauração. Vídeos e legendas locais não precisam ser enviados.","isAccessibleForFree":true,"applicationCategory":"MultimediaApplication","operatingSystem":"Any"}</script><meta name="theme-color" content="#602f75">
+ <link rel="icon" type="image/x-icon" sizes="96x96" href="https://m3u8-player.com/static/favicon.8076cd64d48ca5ff.ico">
+ <link rel="icon" type="image/png" sizes="96x96" href="https://m3u8-player.com/static/favicon.131d19170c748e96.png">
+ <link rel="apple-touch-icon" sizes="180x180" href="https://m3u8-player.com/static/apple-touch-icon.1a3a38fd841885bd.png">
+ <link rel="manifest" href="https://m3u8-player.com/pt/site.webmanifest"><link rel="stylesheet" href="https://cdn.staticfile.net/font-awesome/7.0.1/css/fontawesome.min.css">
+ <link rel="stylesheet" href="https://cdn.staticfile.net/font-awesome/7.0.1/css/solid.min.css">
+ <link rel="stylesheet" href="https://cdn.staticfile.net/font-awesome/7.0.1/css/regular.min.css">
+ <link rel="stylesheet" href="./scripts/original/styles.d7920f3277104866.css">
+ <script defer src="./scripts/original/hls-1.7.3.min.a12e7ee1cd64a69d.js"></script>
+ <script defer src="./scripts/original/artplayer-5.4.0.f1db1fa3406aa6d4.js"></script>
+ <script defer src="./scripts/original/pt.5cf9caa89e94e58e.js"></script>
+ <script defer src="./scripts/original/i18n.56e13830f9301df2.js"></script>
+ <script defer src="./scripts/original/core.8806a12a131d471e.js"></script>
+ <script defer src="https://m3u8-player.com/static/playlist.68db47e110f6fe8e.js"></script>
+ <script defer src="./scripts/original/history-backup.9775813598e013d7.js"></script>
+ <script defer src="./scripts/original/captions.e5d7190c3c8660d9.js"></script>
+ <script defer src="./scripts/original/app.4a327f7b5bc035b7.js"></script>
+ </head>
+ <body>
+ <!-- Google Tag Manager (noscript) -->
+ <noscript><iframe src="https\://www.googletagmanager.com/ns.html?id=GTM-5ZCCF4JX"
+ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+ <!-- End Google Tag Manager (noscript) -->
+ <a class="skip-link" href="https://m3u8-player.com/pt/?utm_source=chatgpt.com#source-url">Ir para a URL do vídeo</a>
+ <header class="site-header has-navigation">
+ <h1 class="brand-heading"><a href="https://m3u8-player.com/pt/" class="brand" aria-label="Início do M3U8"><img src="https://m3u8-player.com/static/logo-international.d28300623ac937d9.svg" alt="M3U8" width="735" height="291"><span class="brand-word" dir="auto">Player</span></a></h1>
+ <nav class="primary-nav" aria-label="Navegação principal">
+ <a href="https://m3u8-player.com/pt/" aria-current="page">Reprodutor</a>
+ <a href="https://m3u8-player.com/pt/download/">Baixar M3U8</a>
+ <a href="https://m3u8-player.com/pt/player-integration/">Integração</a>
+ </nav>
+ <div class="header-actions">
+ <button class="help-button" data-help aria-label="Ajuda do player"><i class="icon fa-regular fa-circle-question" aria-hidden="true"></i><span class="help-label">Ajuda</span></button>
+ <details class="language-menu"><summary aria-label="Alterar idioma"><i class="icon fa-solid fa-globe" aria-hidden="true"></i><span class="language-current">Português</span><i class="icon fa-solid fa-chevron-down" aria-hidden="true"></i></summary><nav class="language-options" aria-label="Alterar idioma"><a href="https://m3u8-player.com/ar/" lang="ar" hreflang="ar">العربية</a>
+ <a href="https://m3u8-player.com/de/" lang="de" hreflang="de">Deutsch</a>
+ <a href="https://m3u8-player.com/" lang="en" hreflang="en">English</a>
+ <a href="https://m3u8-player.com/es/" lang="es" hreflang="es">Español</a>
+ <a href="https://m3u8-player.com/fr/" lang="fr" hreflang="fr">Français</a>
+ <a href="https://m3u8-player.com/hi/" lang="hi" hreflang="hi">हिन्दी</a>
+ <a href="https://m3u8-player.com/id/" lang="id" hreflang="id">Bahasa Indonesia</a>
+ <a href="https://m3u8-player.com/it/" lang="it" hreflang="it">Italiano</a>
+ <a href="https://m3u8-player.com/ja/" lang="ja" hreflang="ja">日本語</a>
+ <a href="https://m3u8-player.com/ko/" lang="ko" hreflang="ko">한국어</a>
+ <a href="https://m3u8-player.com/pt/" lang="pt" hreflang="pt" aria-current="page">Português<i class="icon fa-solid fa-check" aria-hidden="true"></i></a>
+ <a href="https://m3u8-player.com/ru/" lang="ru" hreflang="ru">Русский</a>
+ <a href="https://m3u8-player.com/th/" lang="th" hreflang="th">ไทย</a>
+ <a href="https://m3u8-player.com/tr/" lang="tr" hreflang="tr">Türkçe</a>
+ <a href="https://m3u8-player.com/vi/" lang="vi" hreflang="vi">Tiếng Việt</a>
+ <a href="https://m3u8-player.com/zh-cn/" lang="zh-CN" hreflang="zh-CN">简体中文</a>
+ <a href="https://m3u8-player.com/zh-tw/" lang="zh-TW" hreflang="zh-TW">繁體中文</a></nav></details>
+ </div>
+ </header>
+ <main>
+ <section class="source-card" aria-label="Abrir vídeo"><div class="source-top"><div class="source-tabs" role="tablist" aria-label="Fonte do vídeo"><button id="url-tab" class="source-tab active" role="tab" aria-selected="true" aria-controls="url-pane"><i class="icon fa-solid fa-link" aria-hidden="true"></i>URL do vídeo</button><button id="local-tab" class="source-tab" role="tab" aria-selected="false" aria-controls="local-pane" tabindex="-1"><i class="icon fa-regular fa-folder-open" aria-hidden="true"></i>Vídeo local</button></div><button type="button" id="advanced-toggle" class="text-button muted" aria-expanded="false" aria-controls="advanced-options"><i class="icon fa-solid fa-sliders" aria-hidden="true"></i>Opções</button></div>
+ <form id="source-form" novalidate><div id="url-pane" role="tabpanel" aria-labelledby="url-tab"><label for="source-url" class="sr-only">URL do vídeo</label><div class="url-row"><div class="url-input-wrap"><i class="icon fa-solid fa-link" aria-hidden="true"></i><input id="source-url" dir="ltr" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="Cole a URL do vídeo" aria-describedby="source-message"><button type="button" id="clear-url" class="icon-button" aria-label="Limpar campo"><i class="icon fa-solid fa-xmark" aria-hidden="true"></i></button></div><button type="submit" class="primary-button"><i class="icon fa-solid fa-play" aria-hidden="true"></i>Reproduzir</button></div></div>
+ <div id="local-pane" role="tabpanel" aria-labelledby="local-tab" hidden><button type="button" class="local-drop" id="local-pick"><i class="icon fa-regular fa-folder-open" aria-hidden="true"></i><span><strong>Escolha ou arraste um vídeo</strong></span><span class="choose-file">Escolher arquivo</span></button></div>
+ <p id="source-message" role="status" hidden></p>
+ <div id="advanced-options" class="advanced-options" hidden><label>Nome do vídeo <input id="source-title" maxlength="120" placeholder="Opcional"></label><label>Formato <select id="source-type"><option value="auto">Detectar automaticamente</option><option value="hls">HLS / M3U8</option><option value="video">MP4 / WebM</option></select></label><label class="check-label"><input id="remember-history" type="checkbox" checked>Salvar histórico e progresso</label></div></form></section>
+ <div class="workspace" id="workspace"><section class="watch-column" id="watch-column" aria-label="Player de vídeo" hidden><div class="player-card"><div class="player-topline"><span class="screen-label"><span id="status-dot" class="status-dot"></span><span id="play-status" role="status">Pronto</span></span><span id="stream-format"></span></div><div class="stage" id="stage"><div id="player" aria-label="Área de reprodução"></div>
+ <div id="player-error" class="player-error" role="alert" hidden><span class="error-mark"><i class="icon fa-solid fa-circle-exclamation" aria-hidden="true"></i></span><h2 id="error-title">Não foi possível reproduzir</h2><p id="error-detail"></p><button id="retry-button" class="primary-button" type="button">Tentar novamente</button></div></div>
+ <div class="now-playing"><div class="now-title"><span class="now-icon"><i class="icon fa-solid fa-play" aria-hidden="true"></i></span><div><h2 id="video-title"></h2><p id="video-detail"></p></div></div><button id="favorite-current" class="icon-button" title="Adicionar vídeo aos favoritos" aria-label="Adicionar vídeo aos favoritos" aria-pressed="false" disabled><i class="icon fa-regular fa-star" aria-hidden="true"></i></button></div>
+ <div class="player-tools" role="group" aria-label="Player de vídeo"><button type="button" id="subtitle-pick" class="tool-button" disabled><i class="icon fa-regular fa-closed-captioning" aria-hidden="true"></i><span>Adicionar legendas</span></button><button type="button" id="loop-toggle" class="tool-button" aria-pressed="false" disabled><i class="icon fa-solid fa-repeat" aria-hidden="true"></i><span>Repetir</span></button><button type="button" id="share-qr" class="tool-button" data-qr-library="/static/qrcodegen.2511bc17f40a3c41.js" aria-haspopup="dialog" aria-controls="share-dialog" disabled><i class="icon fa-solid fa-qrcode" aria-hidden="true"></i><span>Compartilhar QR</span></button><button type="button" id="keyboard-help" class="tool-button" aria-haspopup="dialog" aria-controls="help-dialog"><i class="icon fa-regular fa-circle-question" aria-hidden="true"></i><span>Ajuda</span></button><button type="button" id="lights-toggle" class="tool-button" aria-pressed="false" disabled><i class="icon fa-regular fa-lightbulb" aria-hidden="true"></i><span id="lights-label">Apagar luzes</span></button><button type="button" id="theater-toggle" class="tool-button" aria-pressed="false"><i class="icon fa-solid fa-expand" aria-hidden="true"></i><span>Modo cinema</span></button></div>
+ <div id="stream-tools" class="stream-tools" hidden><label>Qualidade <select id="quality-select" aria-label="Selecionar qualidade"><option value="-1">Auto</option></select></label><label id="audio-control" hidden>Áudio <select id="audio-select" aria-label="Selecionar faixa de áudio"></select></label><label id="subtitle-control" hidden>Legendas <select id="subtitle-select" aria-label="Selecionar legendas"></select></label><button type="button" id="subtitle-settings" class="text-button" aria-haspopup="dialog" aria-controls="caption-dialog" hidden><i class="icon fa-solid fa-sliders" aria-hidden="true"></i>Configurações de legendas</button><button type="button" id="live-edge" class="text-button" hidden>Ir ao vivo</button></div></div>
+ </section>
+ <div class="history-column"><section class="playlist-panel" aria-labelledby="playlist-heading">
+ <div class="playlist-heading"><h2 id="playlist-heading"><i class="icon fa-solid fa-list-ul" aria-hidden="true"></i>Lista de reprodução<span id="playlist-count" hidden>0</span></h2><button type="button" id="playlist-add" class="text-button" aria-haspopup="dialog" aria-controls="playlist-dialog"><i class="icon fa-solid fa-plus" aria-hidden="true"></i><span>Adicionar vídeos</span></button></div>
+ <div id="playlist-content" hidden>
+ <div class="playlist-controls"><button type="button" id="playlist-prev" class="secondary-button" disabled><i class="icon fa-solid fa-backward-step" aria-hidden="true"></i><span>Anterior</span></button><button type="button" id="playlist-next" class="secondary-button" disabled><span>Próximo</span><i class="icon fa-solid fa-forward-step" aria-hidden="true"></i></button><label class="playlist-auto" title="A repetição de um vídeo tem prioridade sobre o avanço automático."><input id="playlist-auto" type="checkbox" checked><span>Reproduzir o próximo</span></label></div>
+ <ol id="playlist-list" aria-label="Lista de reprodução"></ol>
+ <div class="playlist-footer"><button type="button" id="playlist-clear" class="text-button" aria-haspopup="dialog" aria-controls="playlist-clear-dialog"><i class="icon fa-regular fa-trash-can" aria-hidden="true"></i>Limpar lista</button></div>
+ </div></section>
+ <aside class="history-panel is-empty" id="history-panel" aria-labelledby="history-heading"><div class="history-heading"><h2 id="history-heading"><i class="icon fa-regular fa-clock" aria-hidden="true"></i>Histórico <span id="history-count" hidden>0</span></h2><div class="history-heading-actions"><button type="button" id="export-history" class="text-button history-export" title="Exportar todo o histórico de reprodução como TXT" aria-label="Exportar todo o histórico de reprodução como TXT" hidden disabled><i class="icon fa-solid fa-file-arrow-down" aria-hidden="true"></i><span>Exportar histórico de reprodução</span></button><button id="clear-history" hidden class="icon-button" title="Limpar todo o histórico" aria-label="Limpar todo o histórico" disabled><i class="icon fa-regular fa-trash-can" aria-hidden="true"></i></button></div></div><div class="history-tabs" hidden role="tablist" aria-label="Filtrar histórico"><button id="all-tab" role="tab" aria-selected="true" class="active" aria-controls="history-list">Recentes</button><button id="favorites-tab" role="tab" aria-selected="false" aria-controls="history-list" tabindex="-1"><i class="icon fa-regular fa-star" aria-hidden="true"></i>Favoritos</button></div><label class="history-search" hidden><i class="icon fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="history-search" placeholder="Buscar no histórico" aria-label="Buscar no histórico" type="search"></label><div id="history-list" role="tabpanel" aria-labelledby="history-heading"><div class="history-empty">Nenhum vídeo no histórico</div></div><div class="history-backup-bar"><button type="button" id="history-backup" class="text-button" aria-haspopup="dialog" aria-controls="backup-dialog"><i class="icon fa-solid fa-box-archive" aria-hidden="true"></i>Backup e restauração do histórico</button></div></aside>
+ <section class="call-card" aria-labelledby="call-heading"><div class="call-card-heading"><h2 id="call-heading"><a class="call-title-link" href="https://m3u8-player.com/pt/player-integration/" target="_blank" rel="noopener" data-player-guide><i class="icon fa-solid fa-code" aria-hidden="true"></i><span>Integração do player</span><i class="icon fa-solid fa-arrow-up-right-from-square call-title-arrow" aria-hidden="true"></i></a></h2><a class="call-details-link text-button" href="https://m3u8-player.com/pt/player-integration/" target="_blank" rel="noopener" data-player-guide>Saiba mais<i class="icon fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></div><div class="call-card-content"><p>Inclua o URL do vídeo em um link para abri-lo aqui a partir do seu site ou aplicativo.</p><code dir="ltr" data-call-example="url">https\://m3u8-player.com/pt/#url=https\://example.com/video.m3u8</code><div class="call-actions"><button type="button" id="call-copy" class="text-button"><i class="icon fa-regular fa-copy" aria-hidden="true"></i><span id="call-copy-label">Copiar exemplo</span></button></div></div></section>
+ </div></div>
+ </main>
+ <footer class="site-footer"><div class="footer-inner"><span class="footer-copyright">© <span id="footer-year">2026</span> m3u8-player.com</span><nav class="footer-actions" aria-label="Navegação do rodapé"><a id="privacy-help" href="https://m3u8-player.com/privacy/" lang="en" hreflang="en">Privacy Policy</a><button type="button" id="back-to-top" hidden><i class="icon fa-solid fa-arrow-up" aria-hidden="true"></i><span>Voltar ao topo</span></button></nav></div></footer>
+ <br>
+ <button id="lights-overlay" class="lights-overlay" type="button" tabindex="-1" aria-label="Acender luzes" hidden></button>
+ <input id="video-file" type="file" accept="video/*,.mp4,.webm,.mov,.m4v,.ogv" hidden><input id="subtitle-file" type="file" accept=".srt,.vtt" hidden><div id="toast" class="toast" role="status" hidden></div>
+ <dialog id="help-dialog" class="app-dialog"><div class="dialog-header"><h2>Ajuda do player</h2><button class="icon-button" data-close aria-label="Fechar ajuda"><i class="icon fa-solid fa-xmark" aria-hidden="true"></i></button></div><div class="dialog-content"><button type="button" id="demo-button" class="text-button">Reproduzir vídeo de exemplo</button><h3>Vídeos online e locais</h3><p>Cole uma URL direta HTTP / HTTPS para reproduzir HLS ao vivo ou sob demanda e arquivos MP4 ou WebM compatíveis. URLs sem extensão são tratadas como HLS; altere o formato em Opções.</p><p>Escolha um vídeo local ou arraste-o para a página; ele não será enviado. M3U8 locais dependem de segmentos separados: use uma URL online. Após abrir o vídeo, adicione legendas SRT ou VTT em UTF-8.</p><h3>Lista de reprodução</h3><p>Uma URL de vídeo por linha ou Título | URL. Até 100 vídeos; URLs duplicadas são ignoradas. Selecione um item para reproduzir.</p><h3>Guia de integração do player</h3><p>Inclua o URL do vídeo em um link para abri-lo aqui a partir do seu site ou aplicativo. <a href="https://m3u8-player.com/pt/player-integration/" target="_blank" rel="noopener" data-player-guide class="help-guide-link">Ver instruções <i class="icon fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p><h3>Problemas de reprodução</h3><p>Páginas HTTPS precisam de fontes HTTPS. Listas, segmentos, legendas e chaves devem permitir CORS. URLs expiradas, proteção contra links externos, login, DRM ou codecs incompatíveis podem impedir a reprodução. O player não contorna essas restrições.</p><h3 id="privacy-heading" tabindex="-1">Histórico e privacidade</h3><p>Os últimos 50 registros, URLs completas, favoritos e progresso ficam neste navegador e são compartilhados entre idiomas. Desative novos registros em Opções ou limpe o histórico. Arquivos locais não são registrados. O navegador acessa as fontes diretamente e carrega ícones do Staticfile CDN. O exemplo não é reproduzido automaticamente.</p><p>Este site carrega o Google Tag Manager para gerenciar tags, incluindo análise de uso. O tratamento de dados depende dos serviços ativados no contêiner.</p><h3>Atalhos de teclado</h3><div class="shortcut-grid"><span><kbd>Space</kbd> Reproduzir / pausar</span><span><kbd>←</kbd><kbd>→</kbd> Voltar / avançar 5 segundos</span><span><kbd>↑</kbd><kbd>↓</kbd> Ajustar volume</span><span><kbd>M</kbd> Silenciar / ativar som</span><span><kbd>F</kbd> Alternar tela cheia</span><span><kbd>Esc</kbd> Sair do modo cinema / acender luzes</span></div><p class="small-note">Os atalhos funcionam com o foco no player. Tela cheia, picture-in-picture e codecs dependem do dispositivo e navegador. O Safari gerencia a qualidade do HLS nativo automaticamente.</p></div></dialog>
+ <dialog id="privacy-dialog" class="app-dialog privacy-dialog" lang="en" dir="ltr" aria-labelledby="privacy-title"><div class="dialog-header"><h2 id="privacy-title" tabindex="-1">Privacy Policy</h2><button class="icon-button" data-close aria-label="Close privacy policy"><i class="icon fa-solid fa-xmark" aria-hidden="true"></i></button></div><div class="privacy-scroll"></div><div class="privacy-dialog-footer"><a href="https://m3u8-player.com/privacy/" target="_blank" rel="noopener">Open full page <i class="icon fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></div></dialog>
+ <dialog id="share-dialog" class="app-dialog share-dialog" aria-labelledby="share-title" aria-describedby="share-hint"><div class="dialog-header"><h2 id="share-title" tabindex="-1"><i class="icon fa-solid fa-qrcode" aria-hidden="true"></i>Compartilhar QR</h2><button type="button" class="icon-button" data-close aria-label="Fechar compartilhamento"><i class="icon fa-solid fa-xmark" aria-hidden="true"></i></button></div><p id="share-hint">Escaneie com outro dispositivo para abrir este vídeo.</p><div class="share-qr-board"><canvas id="share-canvas" role="img" aria-label="Escaneie com outro dispositivo para abrir este vídeo." hidden></canvas><p id="share-status" role="status">Carregando…</p></div><p id="share-video-title" dir="auto"></p><label id="share-position-row" class="share-position" hidden><input id="share-position" type="checkbox"><span id="share-position-label"></span></label><label class="share-link-label" for="share-link">Link de reprodução</label><textarea id="share-link" dir="ltr" rows="2" readonly spellcheck="false"></textarea><div class="share-actions"><button type="button" id="share-system" class="primary-button" hidden><i class="icon fa-solid fa-share-nodes" aria-hidden="true"></i>Compartilhar no dispositivo</button><button type="button" id="share-copy" class="primary-button"><i class="icon fa-regular fa-copy" aria-hidden="true"></i>Copiar link</button></div><p id="share-system-note" hidden>Você também pode copiar o link ou escanear o QR code.</p></dialog>
+ <dialog id="playlist-dialog" class="app-dialog playlist-dialog" aria-labelledby="playlist-dialog-title" aria-describedby="playlist-help"><div class="dialog-header"><h2 id="playlist-dialog-title">Adicionar vídeos</h2><button type="button" class="icon-button" data-close aria-label="Fechar ajuda"><i class="icon fa-solid fa-xmark" aria-hidden="true"></i></button></div><form id="playlist-form" novalidate><p id="playlist-help">Uma URL de vídeo por linha ou Título | URL. Até 100 vídeos; URLs duplicadas são ignoradas. Selecione um item para reproduzir.</p><label for="playlist-input" class="sr-only">Adicionar vídeos</label><textarea id="playlist-input" dir="ltr" rows="7" maxlength="2097152" spellcheck="false" aria-describedby="playlist-help playlist-error" autofocus></textarea><p id="playlist-error" class="form-error" role="alert" hidden></p><div class="dialog-actions"><button type="submit" class="primary-button"><i class="icon fa-solid fa-plus" aria-hidden="true"></i>Adicionar à lista</button></div></form></dialog>
+ <dialog id="playlist-clear-dialog" class="app-dialog compact-dialog" aria-labelledby="playlist-clear-title"><div class="dialog-header"><h2 id="playlist-clear-title">Limpar lista</h2><button type="button" class="icon-button" data-close aria-label="Fechar ajuda"><i class="icon fa-solid fa-xmark" aria-hidden="true"></i></button></div><p>Remover todos os itens? O vídeo atual continuará sendo reproduzido.</p><div class="dialog-actions"><button type="button" id="playlist-confirm-clear" class="primary-button">Limpar lista</button></div></dialog>
+ <dialog id="backup-dialog" class="app-dialog backup-dialog settings-dialog" aria-labelledby="backup-title" aria-describedby="backup-intro"><div class="dialog-header"><h2 id="backup-title">Backup e restauração do histórico</h2><button type="button" class="icon-button" data-close aria-label="Fechar"><i class="icon fa-solid fa-xmark" aria-hidden="true"></i></button></div><div class="settings-scroll"><p id="backup-intro">O JSON inclui URLs completas, favoritos e progresso. A importação mescla registros, mantendo o progresso mais recente e os favoritos existentes. Nenhum arquivo é enviado.</p><div class="backup-actions"><button type="button" id="backup-export" class="secondary-button"><i class="icon fa-solid fa-file-arrow-down" aria-hidden="true"></i>Exportar backup</button><button type="button" id="backup-import" class="primary-button"><i class="icon fa-solid fa-file-arrow-up" aria-hidden="true"></i>Importar backup</button></div><input type="file" id="backup-file" accept=".json,application/json" hidden><p id="backup-error" class="form-error" role="alert" hidden></p><section id="backup-preview" class="backup-preview" hidden aria-live="polite"><strong id="backup-file-name" dir="auto"></strong><p id="backup-summary"></p></section></div><div class="dialog-actions settings-footer" id="backup-confirm-row" hidden><button type="button" id="backup-confirm" class="primary-button" disabled>Mesclar histórico</button></div></dialog>
+ <dialog id="caption-dialog" class="app-dialog caption-dialog settings-dialog" aria-labelledby="caption-title"><div class="dialog-header"><h2 id="caption-title">Configurações de legendas</h2><button type="button" class="icon-button" data-close aria-label="Fechar"><i class="icon fa-solid fa-xmark" aria-hidden="true"></i></button></div><div class="caption-controls settings-scroll"><label for="caption-delay">Atraso das legendas (segundos)</label><input type="number" id="caption-delay" min="-60" max="60" step="0.1" value="0" dir="ltr" aria-describedby="caption-delay-help"><div class="caption-step"><button type="button" id="caption-earlier" class="secondary-button">0,5 s antes</button><button type="button" id="caption-later" class="secondary-button">0,5 s depois</button></div><p id="caption-delay-help">Valores positivos atrasam e negativos adiantam (±60 s). O atraso é zerado ao trocar de vídeo. Os estilos são salvos no navegador.</p><p id="caption-off-note" hidden>Selecione uma faixa de legendas primeiro.</p><div class="caption-style-fields"><label>Tamanho do texto<select id="caption-size"><option value="default">Padrão</option><option value="small">Pequeno</option><option value="medium">Médio</option><option value="large">Grande</option><option value="xlarge">Muito grande</option></select></label><label>Fundo<select id="caption-background"><option value="default">Padrão</option><option value="soft">Translúcido</option><option value="solid">Preto</option><option value="none">Transparente</option></select></label></div><div class="caption-preview-board"><span id="caption-preview">Prévia das legendas</span></div><p class="caption-note">O navegador renderiza as legendas. A tela cheia nativa ou picture-in-picture pode usar estilos do sistema.</p></div><div class="dialog-actions settings-footer"><button type="button" id="caption-reset" class="secondary-button">Redefinir</button><button type="button" class="primary-button" data-close>Concluído</button></div></dialog>
+ <dialog id="clear-dialog" class="app-dialog compact-dialog"><div class="dialog-header"><h2>Limpar histórico?</h2><button class="icon-button" data-close aria-label="Cancelar limpeza"><i class="icon fa-solid fa-xmark" aria-hidden="true"></i></button></div><p>O histórico, os favoritos e o progresso deste navegador serão excluídos. Esta ação não pode ser desfeita.</p><div class="dialog-actions"><button class="secondary-button" data-close>Manter histórico</button><button id="confirm-clear" class="primary-button">Limpar histórico</button></div></dialog>
+ <noscript><p class="noscript">Ative o JavaScript para usar o player.</p></noscript>
+ </body></html>

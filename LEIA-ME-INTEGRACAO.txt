@@ -1,0 +1,8 @@
+VERSAO DE TESTE COM HTML ORIGINAL
+
+O index.html foi reconstruido a partir do HTML original enviado. Os arquivos originais presentes no ZIP foram ligados localmente em ./scripts/original/.
+
+DEPENDENCIA AINDA EXTERNA:
+playlist.68db47e110f6fe8e.js nao estava no ZIP recebido. Por isso, o HTML aponta temporariamente para a copia publicada em https://m3u8-player.com/static/playlist.68db47e110f6fe8e.js. Para deixar tudo local, baixe esse arquivo e coloque-o em scripts/original/, depois troque o src no index.html para ./scripts/original/playlist.68db47e110f6fe8e.js.
+
+Os scripts antigos do EdifesfPlayer foram mantidos no projeto, mas nao sao carregados por este index.html.
