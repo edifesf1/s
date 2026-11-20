@@ -1,0 +1,88 @@
+
+/* EdifesfPlayer - modo tela total: preserva o player original */
+html, body {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #000 !important;
+}
+body {
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+}
+.site-header,
+.site-footer,
+.skip-link,
+.source-card,
+.history-column,
+.call-card,
+.player-topline,
+.now-playing,
+.player-tools,
+.stream-tools,
+body > br {
+  display: none !important;
+}
+main {
+  display: block !important;
+  width: 100% !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+.workspace,
+.watch-column,
+.player-card,
+.stage,
+#player {
+  display: flex !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+.workspace {
+  display: block !important;
+}
+.watch-column {
+  display: flex !important;
+}
+.player-card {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  background: #000 !important;
+}
+.stage {
+  position: relative !important;
+  flex: 1 1 auto !important;
+  aspect-ratio: auto !important;
+  background: #000 !important;
+}
+#player {
+  position: absolute !important;
+  inset: 0 !important;
+}
+#player video,
+#player iframe,
+#player > div {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: contain !important;
+}
