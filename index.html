@@ -479,59 +479,17 @@ if (embedMode) {
   }
 
   // DETECTA ARQUIVO M3U8 QUE CONTÉM SOMENTE OUTRA URL
+  
+  
   //começa aqui
-
 async function resolverFonte(url) {
-  try {
-    log("Verificando conteúdo da fonte...");
-
-    const response = await fetch(url, {
-      method: "GET",
-      cache: "no-store"
-    });
-
-    if (!response.ok) {
-      log("Não foi possível inspecionar o arquivo. Tentando HLS diretamente.");
-      return url;
-    }
-
-    const text = (await response.text()).trim();
-
-    // Playlist HLS verdadeira
-    if (text.startsWith("#EXTM3U")) {
-      log("Playlist HLS identificada.");
-      return url;
-    }
-
-    // Arquivo contendo apenas outra URL
-    const lines = text
-      .split(/\r?\n/)
-      .map(line => line.trim())
-      .filter(line => line && !line.startsWith("#"));
-
-    if (lines.length === 1) {
-      try {
-        const resolved = new URL(lines[0], url);
-
-        if (["http:", "https:"].includes(resolved.protocol)) {
-          log("Arquivo contém outra URL. Fonte final identificada.");
-          log(resolved.href);
-          return resolved.href;
-        }
-      } catch (e) {}
-    }
-
-    log("Conteúdo não reconhecido. Tentando HLS diretamente.");
-    return url;
-
-  } catch (e) {
-    log("Inspeção direta não disponível: " + e.message);
-    log("HLS.js tentará acessar a fonte normalmente.");
-    return url;
-  }
+  log("Utilizando diretamente a URL informada.");
+  return url;
 }
-
 //termina aqui
+
+
+  
   async function play(raw) {
 
     const value = (raw || "").trim();
