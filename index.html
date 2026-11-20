@@ -239,6 +239,61 @@ pre {
   .tools { grid-template-columns: 1fr; }
   #player { aspect-ratio: 16/9; }
 }
+  
+/* MODO EMBED */
+html.embed-mode,
+html.embed-mode body {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+body.embed-mode .wrap {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+body.embed-mode header,
+body.embed-mode .urlrow,
+body.embed-mode .hint,
+body.embed-mode .status,
+body.embed-mode .tools,
+body.embed-mode .actions,
+body.embed-mode .diag,
+body.embed-mode .note {
+  display: none !important;
+}
+
+body.embed-mode .panel {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: #000;
+}
+
+body.embed-mode .player-frame {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+body.embed-mode #player {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
 </style>
 </head>
 
