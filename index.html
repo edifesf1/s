@@ -736,9 +736,9 @@ async function resolverFonte(url) {
       type: "m3u8",
       customType,
 
-      autoplay: false,
-      muted: false,
-      volume: 0.8,
+autoplay: embedMode,
+muted: embedMode,
+volume: 0.8,
 
       aspectRatio: true,
       autoSize: false,
@@ -779,7 +779,27 @@ async function resolverFonte(url) {
       say("Player pronto. Pressione Play para iniciar.", "ok");
       log("ArtPlayer inicializado.");
     });
+if (embedMode) {
+  art.muted = true;
 
+  const tentarAutoplay = () => {
+    if (!art) return;
+
+    art.muted = true;
+
+    const resultado = art.play();
+
+    if (resultado && typeof resultado.catch === "function") {
+      resultado.catch(error => {
+        log("Autoplay bloqueado pelo navegador: " + error.message);
+      });
+    }
+  };
+
+  art.on("ready", tentarAutoplay);
+  art.on("video:loadedmetadata", tentarAutoplay);
+  art.on("video:canplay", tentarAutoplay);
+}
     art.on("error", err => {
       say("O player encontrou um erro. Consulte o diagnóstico.", "err");
 
