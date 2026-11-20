@@ -1,0 +1,166 @@
+/* EdifesfPlayer - modo pagina inteira */
+html, body {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+.site-header,
+.site-footer,
+.history-column,
+body > .skip-link {
+  display: none !important;
+}
+main {
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+.source-card {
+  flex: 0 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 0;
+  padding: 10px;
+  border-radius: 8px;
+}
+.source-top {
+  margin-bottom: 8px;
+}
+.workspace {
+  display: flex !important;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  margin: 0;
+  gap: 0;
+  overflow: hidden;
+}
+.watch-column {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+.player-card {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.stage {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: auto !important;
+}
+.stage #player,
+.stage #player video,
+.stage #player iframe {
+  width: 100% !important;
+  height: 100% !important;
+}
+.now-playing {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+}
+.player-tools,
+.stream-tools {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+}
+@media (max-width: 640px) {
+  main { padding: 4px; gap: 4px; }
+  .source-card { padding: 7px; }
+  .source-top { margin-bottom: 6px; }
+  .now-playing { padding: 5px 8px; }
+  .player-tools, .stream-tools { padding: 4px 6px; }
+}
+
+
+/* Compatibilidade com a integração anterior: ?embed=1 */
+html.embed-mode,
+html.embed-mode body {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #000 !important;
+}
+html.embed-mode body > .skip-link,
+html.embed-mode .site-header,
+html.embed-mode .site-footer,
+html.embed-mode .source-card,
+html.embed-mode .history-column,
+html.embed-mode .now-playing,
+html.embed-mode .player-tools,
+html.embed-mode #stream-tools,
+html.embed-mode .playlist-section,
+html.embed-mode .small-note {
+  display: none !important;
+}
+html.embed-mode main {
+  display: flex !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+}
+html.embed-mode .workspace,
+html.embed-mode .watch-column,
+html.embed-mode .player-card,
+html.embed-mode .stage,
+html.embed-mode #player {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: #000 !important;
+  overflow: hidden !important;
+}
+html.embed-mode .stage {
+  aspect-ratio: auto !important;
+}
+html.embed-mode #player video,
+html.embed-mode #player iframe,
+html.embed-mode #player canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+html.embed-mode .player-error {
+  max-width: calc(100% - 32px);
+}
