@@ -403,6 +403,14 @@ body.embed-mode #player {
 
   const $ = id => document.getElementById(id);
 
+const embedMode =
+  new URLSearchParams(location.search).get("embed") === "1";
+
+if (embedMode) {
+  document.documentElement.classList.add("embed-mode");
+  document.body.classList.add("embed-mode");
+}
+
   let art = null;
   let hls = null;
   let currentUrl = "";
