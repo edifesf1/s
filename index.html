@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10131c">
+<title>Edifesf Player — HLS / M3U8</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/artplayer@5.4.0/dist/artplayer.css">
+<style>
+:root{color-scheme:dark;--bg:#0b0e15;--panel:#151a26;--line:#293246;--text:#f1f4fb;--muted:#9ca9bd;--accent:#e8bd45}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% 0,#1a2437 0,var(--bg) 58%);color:var(--text);font-family:Arial,Helvetica,sans-serif;min-height:100vh}
+.wrap{width:min(1120px,94%);margin:auto;padding:26px 0 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:13px;background:var(--accent);color:#171717;display:grid;place-items:center;font-size:22px;font-weight:900}
+h1{font-size:clamp(20px,4vw,28px);margin:0}.sub{color:var(--muted);font-size:13px;margin-top:4px}
+.pill{border:1px solid #65552b;color:var(--accent);border-radius:99px;padding:7px 11px;font-size:12px;white-space:nowrap}
+.panel{background:#151a26ed;border:1px solid var(--line);border-radius:17px;padding:18px;box-shadow:0 18px 50px #0005}
+.urlrow{display:flex;gap:10px}input,select,button,textarea{font:inherit;color:var(--text);background:#0c111c;border:1px solid var(--line);border-radius:10px;min-height:44px;padding:0 13px}
+input{flex:1;min-width:0}button{cursor:pointer;font-weight:700}button:hover{filter:brightness(1.12)}
+.primary{background:var(--accent);border-color:var(--accent);color:#171717;padding:0 20px}.secondary{background:#202a3b}
+.hint{font-size:12px;color:var(--muted);line-height:1.5;margin:9px 2px 0}
+.player-frame{margin-top:17px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#000}
+#player{width:100%;height:auto;aspect-ratio:16/9;background:#000}
+.status{display:flex;align-items:center;gap:9px;min-height:38px;color:var(--muted);font-size:13px}
+.dot{width:8px;height:8px;border-radius:50%;background:#8c97a9}.dot.ok{background:#6bd5a1}.dot.err{background:#ff7777}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.tools label{display:block;color:var(--muted);font-size:12px}.tools select{width:100%;margin-top:6px}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+.diag{margin-top:16px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#0c111c}
+.diag summary{padding:12px 14px;cursor:pointer;font-size:13px;font-weight:bold}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;color:#b8c7dc;font:12px/1.5 Consolas,monospace;padding:0 14px 14px;margin:0;max-height:230px;overflow:auto}
+.note{font-size:12px;line-height:1.55;color:var(--muted);margin-top:15px}
+@media(max-width:650px){.wrap{padding-top:17px}.pill{display:none}.panel{padding:13px}.urlrow{flex-direction:column}.urlrow button{width:100%}.tools{grid-template-columns:1fr}#player{aspect-ratio:16/9}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header>
+ <div class="brand"><div class="logo">▶</div><div><h1>Edifesf Player</h1><div class="sub">Reprodutor HLS / M3U8 com ArtPlayer</div></div></div>
+ <span class="pill">ArtPlayer 5.4.0 · HLS.js 1.7.3</span>
+</header>
+<section class="panel">
+ <div class="urlrow">
+  <input id="url" type="url" placeholder="Cole aqui o endereço M3U8" autocomplete="url" spellcheck="false">
+  <button class="primary" id="play">▶ Reproduzir</button>
+ </div>
+ <div class="hint">Cole uma URL direta de vídeo M3U8. Também é possível abrir o player passando ?url=ENDERECO na URL da página.</div>
+ <div class="player-frame"><div id="player"></div></div>
+ <div class="status"><span id="dot" class="dot"></span><span id="status">Aguardando endereço de transmissão.</span></div>
+ <div class="tools">
+  <label>Qualidade da transmissão<select id="quality" disabled><option value="-1">Automática</option></select></label>
+  <label>Faixa de áudio<select id="audio" disabled><option value="-1">Padrão</option></select></label>
+  <label>Legendas<select id="subtitles" disabled><option value="-1">Desativadas</option></select></label>
+  <label>Velocidade<select id="speed"><option value="1">1.0x</option><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2.0x</option></select></label>
+ </div>
+ <div class="actions">
+  <button class="secondary" id="reload">↻ Recarregar</button>
+  <button class="secondary" id="copy">Copiar URL</button>
+  <button class="secondary" id="open">Abrir fonte em nova aba</button>
+ </div>
+ <details class="diag">
+  <summary>Diagnóstico de reprodução</summary>
+  <pre id="log">Nenhum evento registrado.</pre>
+ </details>
+ <div class="note"><strong>Importante:</strong> ArtPlayer melhora a interface e HLS.js processa a transmissão, mas nenhum dos dois remove as restrições CORS, autenticação, referer, geobloqueio ou DRM do servidor de origem. Para fontes que bloqueiam o navegador, será necessário um proxy HTTPS autorizado que encaminhe a playlist e todos os segmentos.</div>
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.7.3/dist/hls.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/artplayer@5.4.0/dist/artplayer.js"></script>
+<script>
+(() => {
+ const $ = id => document.getElementById(id);
+ let art = null, hls = null, currentUrl = "";
+ function say(message,state=""){ $("status").textContent=message; $("dot").className="dot"+(state?" "+state:""); }
+ function log(message){
+   const t=new Date().toLocaleTimeString();
+   $("log").textContent=($("log").textContent==="Nenhum evento registrado."?"":$("log").textContent+"\n")+`[${t}] ${message}`;
+ }
+ function resetOptions(){
+   $("quality").innerHTML='<option value="-1">Automática</option>'; $("quality").disabled=true;
+   $("audio").innerHTML='<option value="-1">Padrão</option>'; $("audio").disabled=true;
+   $("subtitles").innerHTML='<option value="-1">Desativadas</option>'; $("subtitles").disabled=true;
+ }
+ function stop(){
+   if(art){try{art.destroy(false)}catch(e){} art=null;}
+   if(hls){try{hls.destroy()}catch(e){} hls=null;}
+   $("player").innerHTML="";
+   resetOptions();
+ }
+ function fillSelect(select,items,first,label){
+   select.innerHTML="";
+   const base=document.createElement("option");base.value="-1";base.textContent=first;select.appendChild(base);
+   (items||[]).forEach((item,i)=>{const o=document.createElement("option");o.value=String(i);o.textContent=label(item,i);select.appendChild(o)});
+   select.disabled=!(items&&items.length);
+ }
+ function play(raw){
+   const value=(raw||"").trim();
+   if(!value){say("Informe uma URL M3U8.","err");return}
+   let parsed;
+   try{parsed=new URL(value);if(!["http:","https:"].includes(parsed.protocol))throw Error("Protocolo não suportado")}
+   catch(e){say("URL inválida. Use um endereço HTTP ou HTTPS.","err");log(e.message);return}
+   currentUrl=parsed.href;$("url").value=currentUrl;$("log").textContent="Iniciando player…";say("Preparando reprodução…");stop();
+   if(!window.Artplayer){say("Não foi possível carregar a biblioteca ArtPlayer.","err");log("ArtPlayer indisponível. Verifique a conexão com o CDN.");return}
+   const isHls=/\.m3u8($|[?#])/i.test(parsed.pathname+parsed.search)||true;
+   const customType={
+     m3u8:(video,url,player)=>{
+       if(!window.Hls||!Hls.isSupported()){
+         if(video.canPlayType("application/vnd.apple.mpegurl")){video.src=url;return}
+         say("Este navegador não oferece suporte a HLS.","err");return;
+       }
+       hls=new Hls({enableWorker:true,lowLatencyMode:true,backBufferLength:90,maxBufferLength:30});
+       hls.attachMedia(video);
+       hls.on(Hls.Events.MEDIA_ATTACHED,()=>{log("HLS.js conectado ao vídeo.");hls.loadSource(url)});
+       hls.on(Hls.Events.MANIFEST_PARSED,(event,data)=>{
+         say("Playlist carregada. "+data.levels.length+" qualidade(s) disponível(is).","ok");
+         fillSelect($("quality"),data.levels,"Automática",(level,i)=>(level.height?level.height+"p":"Nível "+i)+(level.bitrate?" · "+Math.round(level.bitrate/1000)+" kbps":""));
+         fillSelect($("audio"),hls.audioTracks,"Padrão",track=>track.name||track.lang||"Áudio");
+         fillSelect($("subtitles"),hls.subtitleTracks,"Desativadas",track=>track.name||track.lang||"Legenda");
+         log("Manifesto HLS carregado com "+data.levels.length+" nível(is).");
+       });
+       hls.on(Hls.Events.ERROR,(event,data)=>{
+         const detail=data.details||data.type||"erro desconhecido";
+         log("HLS "+data.type+" / "+detail+(data.response&&data.response.code?" / HTTP "+data.response.code:""));
+         if(data.fatal){
+           if(data.type===Hls.ErrorTypes.NETWORK_ERROR){say("Falha de rede: "+detail+". Verifique CORS e a origem.","err");}
+           else if(data.type===Hls.ErrorTypes.MEDIA_ERROR){say("Erro de mídia; tentando recuperar…");hls.recoverMediaError();}
+           else{say("Falha fatal de reprodução: "+detail,"err");}
+         }
+       });
+     }
+   };
+   art=new Artplayer({
+     container:$("player"),url:currentUrl,type:"m3u8",customType,
+     autoplay:false,muted:false,volume:0.8,aspectRatio:true,autoSize:false,
+     fullscreen:true,fullscreenWeb:true,pip:true,setting:true,
+     playbackRate:true,theme:"#e8bd45",lang:"pt-br",
+     moreVideoAttr:{crossorigin:"anonymous",playsInline:true},
+     controls:[
+       {name:"reload",position:"right",html:"↻",tooltip:"Recarregar",click:()=>play(currentUrl)}
+     ],
+     contextmenu:[{name:"Edifesf Player",html:"Edifesf Player · HLS"}]
+   });
+   art.on("ready",()=>{say("Player pronto. Pressione Play para iniciar.","ok");log("ArtPlayer inicializado.")});
+   art.on("error",err=>{say("O player encontrou um erro. Consulte o diagnóstico.","err");log("ArtPlayer: "+(err&&err.message?err.message:String(err)))});
+   art.on("video:playing",()=>say("Reproduzindo transmissão.","ok"));
+   art.on("video:waiting",()=>say("Aguardando dados da transmissão…"));
+   art.on("video:ended",()=>say("Transmissão encerrada."));
+   log("Fonte: "+currentUrl);
+ }
+ $("play").addEventListener("click",()=>play($("url").value));
+ $("url").addEventListener("keydown",e=>{if(e.key==="Enter")play($("url").value)});
+ $("reload").addEventListener("click",()=>{if(currentUrl)play(currentUrl)});
+ $("copy").addEventListener("click",async()=>{if(!currentUrl)return;try{await navigator.clipboard.writeText(currentUrl);say("URL copiada.","ok")}catch(e){say("Não foi possível copiar a URL.","err")}});
+ $("open").addEventListener("click",()=>{if(currentUrl)window.open(currentUrl,"_blank","noopener")});
+ $("quality").addEventListener("change",()=>{if(hls)hls.currentLevel=Number($("quality").value)});
+ $("audio").addEventListener("change",()=>{if(hls)$("audio").value!=="-1"&&(hls.audioTrack=Number($("audio").value))});
+ $("subtitles").addEventListener("change",()=>{if(hls)hls.subtitleTrack=Number($("subtitles").value)});
+ $("speed").addEventListener("change",()=>{if(art)art.playbackRate=Number($("speed").value)});
+ const incoming=new URLSearchParams(location.search).get("url");
+ if(incoming){$("url").value=incoming;play(incoming)}
+})();
+</script>
+</body>
+</html>
