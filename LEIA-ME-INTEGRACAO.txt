@@ -1,8 +1,21 @@
-VERSAO DE TESTE COM HTML ORIGINAL
+EDIFESFPLAYER - TELA TOTAL + LINKS RAW DO GITHUB
 
-O index.html foi reconstruido a partir do HTML original enviado. Os arquivos originais presentes no ZIP foram ligados localmente em ./scripts/original/.
+Base: EdifesfPlayer_Tela_Total_URL_HASH.zip
 
-DEPENDENCIA AINDA EXTERNA:
-playlist.68db47e110f6fe8e.js nao estava no ZIP recebido. Por isso, o HTML aponta temporariamente para a copia publicada em https://m3u8-player.com/static/playlist.68db47e110f6fe8e.js. Para deixar tudo local, baixe esse arquivo e coloque-o em scripts/original/, depois troque o src no index.html para ./scripts/original/playlist.68db47e110f6fe8e.js.
+MUDANCA DESTA VERSAO
+- Mantem o HTML, o CSS de tela total, o ArtPlayer, o HLS.js e o app original.
+- O endereço informado depois de # continua sendo a entrada do player.
+- Quando o endereço for um arquivo Raw do GitHub dentro de /linksm3u8/, o player busca o texto do arquivo.
+- Se o arquivo contiver uma URL HTTP/HTTPS simples, essa URL (incluindo query string e token) e enviada ao player original.
+- Se o arquivo ja for uma playlist HLS iniciada por #EXTM3U, o proprio arquivo e usado como manifesto.
 
-Os scripts antigos do EdifesfPlayer foram mantidos no projeto, mas nao sao carregados por este index.html.
+EXEMPLO
+https://edifesf1.github.io/s/#https://raw.githubusercontent.com/edifesf1/r/main/linksm3u8/cnn_portugal.m3u8
+
+O arquivo cnn_portugal.m3u8 atualmente contem uma URL direta da transmissao CNN Portugal. O script resolve essa URL antes de iniciar o player.
+
+OBSERVACOES
+- A URL final precisa continuar valida; tokens de transmissao podem expirar.
+- O servidor da transmissao final precisa permitir CORS para que HLS.js consiga carregar manifesto e segmentos.
+- O navegador pode restringir autoplay com som. O player original continua responsavel pela tentativa de reproducao.
+- O arquivo playlist.68db47e110f6fe8e.js continua sendo carregado da origem m3u8-player.com, como na versao-base.
